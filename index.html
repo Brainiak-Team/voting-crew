@@ -2,340 +2,337 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Voting Crew — Bring five friends to the polls</title>
-  <meta name="description" content="A private checklist for the friends you'll take to the polls. Your list stays on your device. Nothing is sent anywhere.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bring your crew. Have an impact!</title>
+  <meta name="description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <style>
-    /* ---- Theme: monochrome base. Restyle a copy of this page by editing these values. ---- */
+    /* ---- Theme. Restyle a copy of this page by editing these values. ---- */
     :root {
-      --bg: #f5f5f5;
-      --card: #ffffff;
+      --bg: #ffffff;
       --ink: #111111;
-      --muted: #5c5c5c;
-      --accent: #111111;      /* buttons, numbers, selected tab */
-      --accent-ink: #ffffff;  /* text on accent */
-      --ok: #111111;          /* checked-off friends */
-      --line: #d4d4d4;
-      --soft: #ebebeb;        /* note box, empty bars */
-      --focus: #111111;
-      --danger: #111111;
-      --cand-1: #111111;      /* odds: leading candidate */
-      --cand-2: #8c8c8c;      /* odds: second candidate */
-      --cand-3: #bdbdbd;
-      --radius: 12px;
+      --muted: #555555;
+      --line: #111111;
+      --accent: #c8102e;      /* shadows, Republican bar */
+      --other: #8a8a8a;       /* other candidates' bars */
+      --track: #ececec;       /* empty part of bars */
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --shadow: 4px 4px 0 var(--accent);
     }
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--ink);
-      line-height: 1.5;
+      font-family: var(--font);
+      line-height: 1.3;
     }
-    main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
-    h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 8px; }
-    .lede { color: var(--muted); margin: 0 0 20px; font-size: 1.05rem; }
-    .privacy {
-      background: var(--soft);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      margin-bottom: 24px;
-      font-size: .95rem;
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 16px max(14px, env(safe-area-inset-left));
+      display: grid;
+      gap: 10px;
+      /* Portrait (phones held upright): stacked. */
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "head"
+        "odds"
+        "arrow"
+        "list"
+        "foot";
     }
-    .privacy strong { color: var(--accent); }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px;
+    h1 {
+      grid-area: head;
+      margin: 0;
+      font-size: clamp(1.7rem, 8.4vw, 3rem);
+      font-weight: 900;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
     }
-    ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-    li { display: flex; align-items: center; gap: 10px; }
-    .num {
-      flex: 0 0 auto;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: var(--accent-ink);
+    h1 span { display: inline-block; }
+
+    /* ---- Odds ---- */
+    .odds { grid-area: odds; }
+    .odds[hidden] { display: none; }
+    .odds h2 {
+      margin: 0 0 2px;
+      font-size: clamp(1.15rem, 5.4vw, 1.6rem);
+      font-weight: 900;
+      text-align: right;
+    }
+    .race { transition: opacity .35s; }
+    .race.fade { opacity: 0; }
+    .race-label { margin: 0 0 4px; font-size: .8rem; color: var(--muted); text-align: right; text-transform: uppercase; letter-spacing: .06em; }
+    .cand { margin: 0 0 6px; }
+    .cand-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 800; }
+    .cand-head .pct { font-variant-numeric: tabular-nums; }
+    .bar { height: 10px; background: var(--track); border: 2px solid var(--line); margin-top: 2px; }
+    .bar > span { display: block; height: 100%; background: var(--other); transition: width .4s; }
+    .bar > span.rep { background: var(--accent); }
+    .odds-src { margin: 2px 0 0; font-size: .68rem; color: var(--muted); text-align: right; }
+
+    /* ---- Arrow ---- */
+    .arrow { grid-area: arrow; margin: -4px 0 -6px; }
+    .arrow svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .arrow .landscape { display: none; }
+    .arrow text { font-family: var(--font); font-weight: 800; fill: var(--ink); }
+
+    /* ---- List ---- */
+    .list { grid-area: list; }
+    ol { list-style: none; margin: 0; padding: 0; counter-reset: slot; }
+    ol li {
+      counter-increment: slot;
+      display: flex; align-items: flex-end; gap: 10px;
+      height: 42px;
+    }
+    ol li::before {
+      content: counter(slot) ".";
+      width: 1.8em; text-align: right;
+      font-size: 1.2rem; font-weight: 800;
+      padding-bottom: 6px;
+    }
+    ol input {
+      flex: 1; min-width: 0;
+      font: inherit; font-size: 1.15rem; font-weight: 600; color: var(--ink);
+      border: 0; border-bottom: 2px solid var(--line); border-radius: 0;
+      background: transparent;
+      padding: 6px 2px 4px;
+    }
+    ol input:focus { outline: none; border-bottom-color: var(--accent); }
+    ol input::placeholder { color: transparent; }
+
+    /* ---- Buttons (shadowed shapes) ---- */
+    .foot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      font: inherit; font-weight: 800; font-size: 1.05rem; color: var(--ink);
+      background: var(--bg);
+      border: 2px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 8px 16px; min-height: 44px;
+      cursor: pointer;
+    }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .expand {
+      position: relative;
+      font: inherit; font-weight: 700; font-style: italic; color: var(--ink);
+      background: none; border: 0; padding: 0; cursor: pointer;
+      min-width: 11em; min-height: 44px; text-align: center;
+    }
+    .expand .say, .expand .down { transition: opacity .4s; }
+    .expand .down {
+      position: absolute; inset: 0;
       display: grid; place-items: center;
-      font-weight: 700;
+      opacity: 0;
     }
-    li.done .num { background: var(--ok); }
-    li.done input[type="text"] { text-decoration: line-through; color: var(--muted); }
-    input[type="text"] {
-      flex: 1 1 0;
-      min-width: 0;
-      width: 100%;
-      font: inherit;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--card);
-      color: var(--ink);
+    .expand .down svg { height: 38px; width: auto; overflow: visible; }
+    .expand.flip .say { opacity: 0; }
+    .expand.flip .down { opacity: 1; }
+    .add { width: 44px; padding: 0; font-size: 1.6rem; line-height: 1; margin: 10px 0 0 2.6em; }
+    [hidden] { display: none !important; }
+
+    /* Landscape and wide screens: the sketch layout. */
+    @media (orientation: landscape) and (min-width: 600px) {
+      .app {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-areas:
+          "head head"
+          "list odds"
+          "list arrow"
+          "foot arrow";
+        column-gap: 28px;
+        border: 2px solid var(--line);
+        margin-top: 12px;
+      }
+      h1 { font-size: clamp(1.6rem, 4.2vw, 3rem); }
+      .arrow { margin: 0 0 0 -40%; align-self: end; justify-self: end; }
+      .arrow svg.landscape { width: auto; height: min(36vh, 230px); }
+      .arrow .portrait { display: none; }
+      .arrow .landscape { display: block; }
+      .foot { justify-content: flex-start; }
+      .list li { height: clamp(34px, 9vh, 46px); }
     }
-    label.check {
-      flex: 0 0 auto;
-      display: flex; align-items: center; gap: 6px;
-      font-size: .9rem; color: var(--muted);
-      cursor: pointer;
-      min-height: 44px;
-    }
-    input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--ok); }
-    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-    .progress { margin: 16px 0 0; font-weight: 600; }
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    button {
-      font: inherit; font-weight: 600;
-      padding: 10px 16px;
-      min-height: 44px;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      background: var(--accent); color: var(--accent-ink);
-      cursor: pointer;
-      transition: opacity .2s;
-    }
-    button.secondary { background: var(--card); color: var(--accent); }
-    button.danger { background: var(--card); color: var(--danger); border-color: var(--danger); }
-    button:hover { opacity: .88; }
-    .status { min-height: 1.5em; margin: 10px 0 0; color: var(--ok); font-size: .95rem; }
-    section.info { margin-top: 28px; }
-    section.info h2 { font-size: 1.15rem; margin: 0 0 8px; }
-    section.info p, section.info li { color: var(--muted); }
-    section.info ul { padding-left: 20px; margin: 0; }
-    .noscript { background: var(--soft); border: 1px solid var(--line); padding: 12px; border-radius: var(--radius); }
-    footer { margin-top: 32px; font-size: .85rem; color: var(--muted); }
-    /* ---- Odds tracker ---- */
-    section.odds { margin-top: 28px; }
-    section.odds h2 { font-size: 1.3rem; margin: 0 0 4px; }
-    .odds-sub { color: var(--muted); margin: 0 0 12px; font-size: .95rem; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .tabs button { flex: 1 1 0; background: var(--card); color: var(--accent); }
-    .tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
-    .race-meta { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
-    .cand { margin: 0 0 14px; }
-    .cand-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-    .cand-name { font-weight: 700; }
-    .cand-party { color: var(--muted); font-size: .9rem; font-weight: 400; }
-    .cand-pct { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .bar { height: 14px; background: var(--soft); border-radius: 7px; overflow: hidden; margin-top: 4px; }
-    .bar > span { display: block; height: 100%; border-radius: 7px; transition: width .3s; }
-    .bar > span.c-0 { background: var(--cand-1); }
-    .bar > span.c-1 { background: var(--cand-2); }
-    .bar > span.c-2 { background: var(--cand-3); }
-    .chart { margin-top: 8px; }
-    .chart svg { width: 100%; height: auto; display: block; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
-    .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-    .stale { color: var(--ink); font-weight: 700; }
-    .odds-foot { font-size: .85rem; color: var(--muted); margin-top: 10px; }
-    .odds-foot a { color: var(--accent); }
-    @media (max-width: 420px) {
-      main { padding: 16px 12px 40px; }
-      h1 { font-size: 1.6rem; }
-      .card { padding: 12px; }
-      li { gap: 8px; }
-      .num { width: 28px; height: 28px; font-size: .9rem; }
-      label.check { font-size: .8rem; gap: 4px; }
-    }
+
     @media print {
-      section.odds { display: none; }
-      body { background: #fff; }
-      .privacy, .actions, .status, section.info, label.check, footer { display: none; }
-      .card { border: none; padding: 0; }
-      input[type="text"] { border: none; border-bottom: 1px solid #000; border-radius: 0; font-size: 1.2rem; }
-      h1::after { content: " \2014 Election Day checklist"; font-size: 1rem; font-weight: 400; }
+      .odds, .arrow, .foot, .add { display: none !important; }
+      .app { display: block; border: 0; }
+      h1 { font-size: 24pt; margin-bottom: 12pt; }
+      ol li { height: 36pt; }
+      ol input { font-size: 16pt; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>My Voting Crew</h1>
-    <p class="lede">Pick up to five friends you'll take to the polls this election. Keep the list handy, and check them off as you go.</p>
+  <main class="app">
+    <h1><span>Bring your crew.</span> <span>Have an impact!</span></h1>
 
-    <div class="privacy" role="note">
-      <strong>Private by design.</strong> Your list is saved only in this browser on this device. It is never sent to a server, and there are no accounts, ads, or trackers.
+    <section class="odds" id="odds" aria-label="Race odds" hidden>
+      <h2>Change the odds!</h2>
+      <div class="race" id="race" aria-live="polite"></div>
+      <p class="odds-src" id="odds-src"></p>
+    </section>
+
+    <div class="arrow" aria-hidden="true">
+      <svg class="portrait" id="arrow-p" viewBox="0 0 400 120"></svg>
+      <svg class="landscape" id="arrow-l" viewBox="0 0 420 210"></svg>
     </div>
 
-    <noscript><p class="noscript">This page needs JavaScript to save your list on your device.</p></noscript>
-
-    <form class="card" id="crew" autocomplete="off" onsubmit="return false">
+    <section class="list" aria-label="Who will you bring to the polls?">
       <ol id="slots"></ol>
-      <p class="progress" id="progress" aria-live="polite"></p>
-      <div class="actions">
-        <button type="button" id="print" class="secondary">Print my list</button>
-        <button type="button" id="clear" class="danger">Erase my list</button>
-      </div>
-      <p class="status" id="status" role="status" aria-live="polite"></p>
-    </form>
-
-    <section class="odds" id="odds" aria-labelledby="odds-h" hidden>
-      <h2 id="odds-h">Ohio race odds</h2>
-      <p class="odds-sub">What traders on a prediction market currently think. It's a market price, not a poll, and not a result.</p>
-      <div class="card">
-        <div class="tabs" id="tabs" role="tablist" aria-label="Choose a race"></div>
-        <div id="race" role="tabpanel" aria-live="polite"></div>
-        <p class="odds-foot" id="odds-foot"></p>
-      </div>
+      <button type="button" class="btn add" id="add" aria-label="Add another name" hidden>+</button>
     </section>
 
-    <section class="info">
-      <h2>Before you go</h2>
-      <ul>
-        <li>Check your registration, polling place, and hours with your official state or local election office.</li>
-        <li>Ask your friends first. A first name or nickname is enough for your list.</li>
-        <li>Offer rides, share the time to go, and bring any ID your state asks for.</li>
-      </ul>
-    </section>
-
-    <section class="info">
-      <h2>About your privacy</h2>
-      <p>Names are stored in your browser's local storage on this device only. Clearing your browser data, using private browsing, or pressing "Erase my list" removes them. Other devices and other browsers will not see your list.</p>
-    </section>
-
-    <footer>A community project. This page does not collect or share any information.</footer>
+    <div class="foot">
+      <button type="button" class="btn" id="print">Print a copy!</button>
+      <button type="button" class="expand" id="expand" aria-label="Popular? Expand your list to ten names">
+        <span class="say">Popular? Expand your list!</span>
+        <span class="down" aria-hidden="true">
+          <svg viewBox="0 0 40 44"><path d="M13 2h14v20h10L20 42 3 22h10z" fill="#c8102e" transform="translate(4 3)"/><path d="M13 2h14v20h10L20 42 3 22h10z" fill="#fff" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+    </div>
   </main>
 
   <script>
     (function () {
       'use strict';
-      var KEY = 'votingCrew.v1';
-      var COUNT = 5;
+      // ---- Page settings ----
+      var SHOW_ODDS = true;      // false removes the odds tracker
+      var START = 5;             // names shown at first
+      var EXPANDED = 10;         // names after "Expand your list"
+      var MAX = 50;              // most names the "+" button allows
+      var RACE_SECONDS = 15;     // time on each race before switching
+      var EXPAND_SECONDS = 5;    // text / arrow swap on the expand button
+
+      var KEY = 'votingCrew.v2';
       var slotsEl = document.getElementById('slots');
-      var progressEl = document.getElementById('progress');
-      var statusEl = document.getElementById('status');
-      var memoryOnly = false;
+      var addBtn = document.getElementById('add');
+      var expandBtn = document.getElementById('expand');
+      var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
       var state = load();
 
-      function blank() {
-        var a = [];
-        for (var i = 0; i < COUNT; i++) a.push({ name: '', done: false });
-        return a;
-      }
-
       function load() {
+        var s = { names: [], expanded: false };
         try {
-          var raw = localStorage.getItem(KEY);
-          if (!raw) return blank();
-          var parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed)) return blank();
-          var out = blank();
-          for (var i = 0; i < COUNT; i++) {
-            if (parsed[i] && typeof parsed[i].name === 'string') {
-              out[i] = { name: parsed[i].name.slice(0, 60), done: parsed[i].done === true };
-            }
+          var raw = JSON.parse(localStorage.getItem(KEY) || 'null');
+          if (raw && Array.isArray(raw.names)) {
+            s.names = raw.names.slice(0, MAX).map(function (n) { return typeof n === 'string' ? n.slice(0, 60) : ''; });
+            s.expanded = raw.expanded === true;
           }
-          return out;
-        } catch (e) {
-          memoryOnly = true;
-          return blank();
-        }
+        } catch (e) {}
+        var want = s.expanded ? Math.max(EXPANDED, s.names.length) : START;
+        while (s.names.length < want) s.names.push('');
+        return s;
       }
-
       function save() {
-        try {
-          localStorage.setItem(KEY, JSON.stringify(state));
-        } catch (e) {
-          memoryOnly = true;
-          say("Your browser blocked saving, so this list will be lost when you close the page.");
-        }
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
       }
 
-      function say(msg) { statusEl.textContent = msg; }
-
-      function updateProgress() {
-        var named = 0, done = 0;
-        state.forEach(function (s) {
-          if (s.name.trim()) { named++; if (s.done) done++; }
-        });
-        progressEl.textContent = named === 0
-          ? 'Add up to five friends above.'
-          : done + ' of ' + named + ' friend' + (named === 1 ? '' : 's') + ' ready to go.';
+      function addSlot(i, focus) {
+        var li = document.createElement('li');
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 60;
+        input.value = state.names[i] || '';
+        input.setAttribute('aria-label', 'Name ' + (i + 1));
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('autocapitalize', 'words');
+        input.setAttribute('spellcheck', 'false');
+        input.addEventListener('input', function () { state.names[i] = input.value; save(); });
+        li.appendChild(input);
+        slotsEl.appendChild(li);
+        if (focus) input.focus();
       }
-
       function render() {
         slotsEl.textContent = '';
-        state.forEach(function (s, i) {
-          var li = document.createElement('li');
-          if (s.done && s.name.trim()) li.className = 'done';
-
-          var num = document.createElement('span');
-          num.className = 'num';
-          num.setAttribute('aria-hidden', 'true');
-          num.textContent = String(i + 1);
-
-          var input = document.createElement('input');
-          input.type = 'text';
-          input.id = 'name' + i;
-          input.maxLength = 60;
-          input.value = s.name;
-          input.placeholder = 'Friend ' + (i + 1);
-          input.setAttribute('aria-label', 'Friend ' + (i + 1) + ' name');
-          input.setAttribute('autocapitalize', 'words');
-          input.setAttribute('spellcheck', 'false');
-          input.addEventListener('input', function () {
-            state[i].name = input.value;
-            if (!input.value.trim()) { state[i].done = false; }
-            li.className = (state[i].done && input.value.trim()) ? 'done' : '';
-            cb.checked = state[i].done;
-            cb.disabled = !input.value.trim();
-            save(); updateProgress(); say('');
-          });
-
-          var label = document.createElement('label');
-          label.className = 'check';
-          var cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = s.done;
-          cb.disabled = !s.name.trim();
-          cb.setAttribute('aria-label', 'Friend ' + (i + 1) + ' is going');
-          cb.addEventListener('change', function () {
-            state[i].done = cb.checked;
-            li.className = (cb.checked && state[i].name.trim()) ? 'done' : '';
-            save(); updateProgress();
-          });
-          label.appendChild(cb);
-          label.appendChild(document.createTextNode('Going'));
-
-          li.appendChild(num);
-          li.appendChild(input);
-          li.appendChild(label);
-          slotsEl.appendChild(li);
-        });
-        updateProgress();
+        state.names.forEach(function (_, i) { addSlot(i); });
+        expandBtn.hidden = state.expanded;
+        addBtn.hidden = !state.expanded || state.names.length >= MAX;
       }
 
+      expandBtn.addEventListener('click', function () {
+        state.expanded = true;
+        var first = state.names.length;
+        while (state.names.length < EXPANDED) state.names.push('');
+        save(); render();
+        var inputs = slotsEl.querySelectorAll('input');
+        if (inputs[first]) inputs[first].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      addBtn.addEventListener('click', function () {
+        if (state.names.length >= MAX) return;
+        state.names.push('');
+        save();
+        addSlot(state.names.length - 1, true);
+        addBtn.hidden = state.names.length >= MAX;
+      });
       document.getElementById('print').addEventListener('click', function () { window.print(); });
 
-      document.getElementById('clear').addEventListener('click', function () {
-        if (!window.confirm('Erase all five names from this device?')) return;
-        state = blank();
-        try { localStorage.removeItem(KEY); } catch (e) {}
-        render();
-        say('Your list has been erased from this device.');
-      });
+      // "Popular? Expand your list!" swaps with a down arrow.
+      setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);
+
+      // ---- Curved arrows: "Who will you bring to the polls?" ----
+      var NS = 'http://www.w3.org/2000/svg';
+      function svgEl(tag, attrs) {
+        var n = document.createElementNS(NS, tag);
+        for (var k in attrs) n.setAttribute(k, attrs[k]);
+        return n;
+      }
+      // Draws a thick curved band ending in an arrowhead, with a red offset shadow,
+      // and the label written along the band (on a left-to-right copy of the curve).
+      function drawArrow(svg, d, textD, width, fontSize) {
+        var probe = svgEl('path', { d: d });
+        svg.appendChild(probe);
+        var len = probe.getTotalLength();
+        var head = width * 1.15;
+        var end = probe.getPointAtLength(len);
+        var before = probe.getPointAtLength(len - 1);
+        svg.removeChild(probe);
+        var ux = end.x - before.x, uy = end.y - before.y;
+        var m = Math.sqrt(ux * ux + uy * uy) || 1; ux /= m; uy /= m;
+        var px = -uy, py = ux;                // perpendicular
+        var tip = { x: end.x + ux * head, y: end.y + uy * head };
+        var w = width * 1.05;
+        var tri = [tip.x, tip.y, end.x + px * w, end.y + py * w, end.x - px * w, end.y - py * w].map(function (v) { return v.toFixed(1); });
+        var triPts = tri[0] + ',' + tri[1] + ' ' + tri[2] + ',' + tri[3] + ' ' + tri[4] + ',' + tri[5];
+
+        var shadow = svgEl('g', { transform: 'translate(6 6)' });
+        shadow.appendChild(svgEl('path', { d: d, fill: 'none', stroke: accent, 'stroke-width': width + 4 }));
+        shadow.appendChild(svgEl('polygon', { points: triPts, fill: accent, stroke: accent, 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+        svg.appendChild(shadow);
+        svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: '#111', 'stroke-width': width + 5 }));
+        svg.appendChild(svgEl('polygon', { points: triPts, fill: '#fff', stroke: '#111', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }));
+        svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: '#fff', 'stroke-width': width }));
+
+        var id = svg.id + '-t';
+        var defs = svgEl('defs', {});
+        defs.appendChild(svgEl('path', { id: id, d: textD }));
+        svg.appendChild(defs);
+        var text = svgEl('text', { 'font-size': fontSize, 'dominant-baseline': 'central' });
+        var tp = svgEl('textPath', { href: '#' + id, startOffset: '50%', 'text-anchor': 'middle' });
+        tp.textContent = 'Who will you bring to the polls?';
+        text.appendChild(tp);
+        svg.appendChild(text);
+      }
+      // Portrait: sweeps from the odds (top right) down to the list (bottom left).
+      drawArrow(document.getElementById('arrow-p'),
+        'M392 22 C 300 88, 150 30, 52 78',
+        'M44 82 C 150 30, 300 88, 400 18', 30, 17);
+      // Landscape: sweeps from bottom right up toward the list on the left.
+      drawArrow(document.getElementById('arrow-l'),
+        'M396 112 C 330 200, 130 200, 70 92',
+        'M72 92 C 130 200, 330 200, 398 108', 36, 18);
 
       render();
-      if (memoryOnly) say("Your browser blocked saving, so this list will be lost when you close the page.");
-    })();
 
-  </script>
-  <script>
-    (function () {
-      'use strict';
-      // ---- Page setting: set to false to remove the odds tracker from this page. ----
-      var SHOW_ODDS = true;
+      // ---- Odds: rotates between races, Republican always on top ----
       if (!SHOW_ODDS) return;
-
-      var STALE_MS = 60 * 60 * 1000;      // warn if data is older than 1 hour
-      var section = document.getElementById('odds');
-      var tabsEl = document.getElementById('tabs');
+      var oddsEl = document.getElementById('odds');
       var raceEl = document.getElementById('race');
-      var footEl = document.getElementById('odds-foot');
-      var data = null;
-      var current = null;
+      var srcEl = document.getElementById('odds-src');
 
       function el(tag, cls, text) {
         var n = document.createElement(tag);
@@ -343,12 +340,6 @@
         if (text !== undefined) n.textContent = text;
         return n;
       }
-      function svgEl(tag, attrs) {
-        var n = document.createElementNS('http://www.w3.org/2000/svg', tag);
-        for (var k in attrs) n.setAttribute(k, attrs[k]);
-        return n;
-      }
-      function pct(p) { return p === null || p === undefined ? '—' : Math.round(p * 100) + '%'; }
       // Whole-number percents that always add to 100 (largest-remainder method).
       function wholePercents(list) {
         var raw = list.map(function (c) { return c.chance === null ? 0 : c.chance * 100; });
@@ -360,140 +351,47 @@
           .forEach(function (o) { floors[o.i] += 1; });
         return floors;
       }
-      // Candidates are shaded by rank (leader darkest) from the theme, not by party.
-      var css = getComputedStyle(document.documentElement);
-      function colorFor(i) { return css.getPropertyValue('--cand-' + Math.min(i + 1, 3)).trim(); }
-
-      function ago(ms) {
-        var m = Math.round(ms / 60000);
-        if (m < 2) return 'just now';
-        if (m < 60) return m + ' minutes ago';
-        var h = Math.round(m / 60);
-        if (h < 48) return h + ' hour' + (h === 1 ? '' : 's') + ' ago';
-        return Math.round(h / 24) + ' days ago';
-      }
-
-      function chart(race) {
-        var W = 600, H = 220, L = 40, R = 12, T = 12, B = 26;
-        var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img',
-          'aria-label': 'Line chart of each candidate\'s chance over the last 30 days' });
-        var pts = [];
-        race.candidates.forEach(function (c) { c.history.forEach(function (h) { pts.push(h); }); });
-        if (pts.length < 2) return null;
-        var t0 = Math.min.apply(null, pts.map(function (p) { return p.t; }));
-        var t1 = Math.max.apply(null, pts.map(function (p) { return p.t; }));
-        if (t1 === t0) return null;
-        function x(t) { return L + (t - t0) / (t1 - t0) * (W - L - R); }
-        function y(p) { return T + (1 - p) * (H - T - B); }
-        [0, .25, .5, .75, 1].forEach(function (g) {
-          svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y(g), y2: y(g), stroke: css.getPropertyValue('--line').trim(), 'stroke-width': 1 }));
-          var lab = svgEl('text', { x: L - 6, y: y(g) + 4, 'text-anchor': 'end', 'font-size': 11, fill: css.getPropertyValue('--muted').trim() });
-          lab.textContent = Math.round(g * 100) + '%';
-          svg.appendChild(lab);
+      function showRace(race) {
+        var cands = race.candidates.slice().sort(function (a, b) {
+          return (b.partyKey === 'R') - (a.partyKey === 'R');
         });
-        [t0, t1].forEach(function (t, i) {
-          var d = new Date(t * 1000);
-          var lab = svgEl('text', { x: x(t), y: H - 8, 'text-anchor': i ? 'end' : 'start', 'font-size': 11, fill: css.getPropertyValue('--muted').trim() });
-          lab.textContent = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-          svg.appendChild(lab);
-        });
-        race.candidates.forEach(function (c, ci) {
-          if (c.history.length < 2) return;
-          var d = c.history.map(function (h, i) { return (i ? 'L' : 'M') + x(h.t).toFixed(1) + ' ' + y(h.p).toFixed(1); }).join(' ');
-          var line = { d: d, fill: 'none', stroke: colorFor(ci), 'stroke-width': 2.5, 'stroke-linejoin': 'round' };
-          if (ci > 0) line['stroke-dasharray'] = '6 4';  // second line stays readable without color
-          svg.appendChild(svgEl('path', line));
-        });
-        return svg;
-      }
-
-      function renderRace(id) {
-        current = id;
-        var race = data.races.filter(function (r) { return r.id === id; })[0];
-        if (!race) return;
-        Array.prototype.forEach.call(tabsEl.children, function (b) {
-          b.setAttribute('aria-selected', b.dataset.id === id ? 'true' : 'false');
-        });
+        var whole = wholePercents(cands);
         raceEl.textContent = '';
-        raceEl.appendChild(el('p', 'race-meta', race.label + ' — ' + race.subtitle));
-
-        var whole = wholePercents(race.candidates);
-        race.candidates.forEach(function (c, ci) {
+        raceEl.appendChild(el('p', 'race-label', race.label + (race.subtitle && race.subtitle !== 'Ohio' ? ' · ' + race.subtitle : ' · Ohio')));
+        cands.forEach(function (c, i) {
           var wrap = el('div', 'cand');
           var head = el('div', 'cand-head');
-          var name = el('span', 'cand-name', c.name + ' ');
-          name.appendChild(el('span', 'cand-party', '(' + c.party + ')'));
-          head.appendChild(name);
-          head.appendChild(el('span', 'cand-pct', c.chance === null ? '—' : whole[ci] + '%'));
+          head.appendChild(el('span', '', c.name));
+          head.appendChild(el('span', 'pct', c.chance === null ? '—' : whole[i] + '%'));
           wrap.appendChild(head);
           var bar = el('div', 'bar');
-          bar.setAttribute('role', 'img');
-          bar.setAttribute('aria-label', c.name + ': ' + (c.chance === null ? 'no price' : whole[ci] + '%'));
-          var fill = el('span', 'c-' + Math.min(ci, 2));
-          fill.style.width = Math.max(0, Math.min(100, (c.chance || 0) * 100)) + '%';
+          var fill = el('span', c.partyKey === 'R' ? 'rep' : '');
+          fill.style.width = (c.chance === null ? 0 : whole[i]) + '%';
           bar.appendChild(fill);
           wrap.appendChild(bar);
           raceEl.appendChild(wrap);
         });
-
-        var svg = chart(race);
-        if (svg) {
-          var box = el('div', 'chart');
-          box.appendChild(svg);
-          var legend = el('div', 'legend');
-          race.candidates.forEach(function (c, ci) {
-            var item = el('span');
-            var sw = el('i'); sw.style.background = colorFor(ci);
-            item.appendChild(sw);
-            item.appendChild(document.createTextNode(c.name));
-            legend.appendChild(item);
-          });
-          box.appendChild(legend);
-          raceEl.appendChild(box);
-        }
-        race.candidates.forEach(function (c) {
-          if (c.resolves) raceEl.appendChild(el('p', 'race-meta', c.name + ': ' + c.resolves));
-        });
       }
-
-      function renderFoot() {
-        footEl.textContent = '';
-        var age = Date.now() - new Date(data.updated).getTime();
-        var s = el('span', age > STALE_MS ? 'stale' : '', 'Odds from Kalshi, updated ' + ago(age) + (age > STALE_MS ? ' (may be out of date)' : '') + '. ');
-        footEl.appendChild(s);
-        footEl.appendChild(document.createTextNode('A market price is not a poll or a prediction anyone guarantees. '));
-        footEl.appendChild(document.createTextNode('Your visit does not contact Kalshi; this site fetches the odds for you.'));
+      function start(data) {
+        if (!data || !Array.isArray(data.races) || !data.races.length) return;
+        var i = 0;
+        showRace(data.races[0]);
+        srcEl.textContent = 'Kalshi market odds, not a poll.';
+        oddsEl.hidden = false;
+        if (data.races.length < 2) return;
+        setInterval(function () {
+          raceEl.classList.add('fade');
+          setTimeout(function () {
+            i = (i + 1) % data.races.length;
+            showRace(data.races[i]);
+            raceEl.classList.remove('fade');
+          }, 350);
+        }, RACE_SECONDS * 1000);
       }
-
-      function init(d) {
-        if (!d || !Array.isArray(d.races) || d.races.length === 0) return;
-        data = d;
-        d.races.forEach(function (r) {
-          var b = el('button', 'secondary', r.label);
-          b.type = 'button';
-          b.id = 'tab-' + r.id;
-          b.dataset.id = r.id;
-          b.setAttribute('role', 'tab');
-          b.addEventListener('click', function () { renderRace(r.id); });
-          tabsEl.appendChild(b);
-        });
-        tabsEl.addEventListener('keydown', function (e) {
-          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-          var ids = data.races.map(function (r) { return r.id; });
-          var i = ids.indexOf(current) + (e.key === 'ArrowRight' ? 1 : -1);
-          i = (i + ids.length) % ids.length;
-          renderRace(ids[i]);
-          document.getElementById('tab-' + ids[i]).focus();
-        });
-        section.hidden = false;
-        renderRace(d.races[0].id);
-        renderFoot();
-      }
-
-      // Failure leaves the section hidden; the checklist above keeps working on its own.
-      fetch('/api/odds', { cache: 'no-cache' })
+      // Failure leaves the odds hidden; the list keeps working on its own.
+      fetch('/api/odds')
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(init)
+        .then(start)
         .catch(function () {});
     })();
   </script>
