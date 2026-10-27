@@ -1,0 +1,6 @@
+{
+  "name": "voting-crew",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" }
+}

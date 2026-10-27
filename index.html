@@ -8,16 +8,22 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <style>
+    /* ---- Theme: monochrome base. Restyle a copy of this page by editing these values. ---- */
     :root {
-      --bg: #f6f4ef;
+      --bg: #f5f5f5;
       --card: #ffffff;
-      --ink: #1d2433;
-      --muted: #566074;
-      --accent: #1f4e8c;
-      --accent-ink: #ffffff;
-      --ok: #1d6b3a;
-      --line: #d5d9e2;
-      --focus: #b45309;
+      --ink: #111111;
+      --muted: #5c5c5c;
+      --accent: #111111;      /* buttons, numbers, selected tab */
+      --accent-ink: #ffffff;  /* text on accent */
+      --ok: #111111;          /* checked-off friends */
+      --line: #d4d4d4;
+      --soft: #ebebeb;        /* note box, empty bars */
+      --focus: #111111;
+      --danger: #111111;
+      --cand-1: #111111;      /* odds: leading candidate */
+      --cand-2: #8c8c8c;      /* odds: second candidate */
+      --cand-3: #bdbdbd;
       --radius: 12px;
     }
     * { box-sizing: border-box; }
@@ -32,8 +38,8 @@
     h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 8px; }
     .lede { color: var(--muted); margin: 0 0 20px; font-size: 1.05rem; }
     .privacy {
-      background: #e8f0fb;
-      border: 1px solid #bcd0ec;
+      background: var(--soft);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 12px 14px;
       margin-bottom: 24px;
@@ -67,7 +73,7 @@
       padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--card);
       color: var(--ink);
     }
     label.check {
@@ -91,22 +97,22 @@
       cursor: pointer;
       transition: opacity .2s;
     }
-    button.secondary { background: #fff; color: var(--accent); }
-    button.danger { background: #fff; color: #9b1c1c; border-color: #9b1c1c; }
+    button.secondary { background: var(--card); color: var(--accent); }
+    button.danger { background: var(--card); color: var(--danger); border-color: var(--danger); }
     button:hover { opacity: .88; }
     .status { min-height: 1.5em; margin: 10px 0 0; color: var(--ok); font-size: .95rem; }
     section.info { margin-top: 28px; }
     section.info h2 { font-size: 1.15rem; margin: 0 0 8px; }
     section.info p, section.info li { color: var(--muted); }
     section.info ul { padding-left: 20px; margin: 0; }
-    .noscript { background: #fff3cd; border: 1px solid #e5c76b; padding: 12px; border-radius: var(--radius); }
+    .noscript { background: var(--soft); border: 1px solid var(--line); padding: 12px; border-radius: var(--radius); }
     footer { margin-top: 32px; font-size: .85rem; color: var(--muted); }
     /* ---- Odds tracker ---- */
     section.odds { margin-top: 28px; }
     section.odds h2 { font-size: 1.3rem; margin: 0 0 4px; }
     .odds-sub { color: var(--muted); margin: 0 0 12px; font-size: .95rem; }
     .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .tabs button { flex: 1 1 0; background: #fff; color: var(--accent); }
+    .tabs button { flex: 1 1 0; background: var(--card); color: var(--accent); }
     .tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
     .race-meta { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
     .cand { margin: 0 0 14px; }
@@ -114,16 +120,16 @@
     .cand-name { font-weight: 700; }
     .cand-party { color: var(--muted); font-size: .9rem; font-weight: 400; }
     .cand-pct { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .bar { height: 14px; background: #e6e9f0; border-radius: 7px; overflow: hidden; margin-top: 4px; }
+    .bar { height: 14px; background: var(--soft); border-radius: 7px; overflow: hidden; margin-top: 4px; }
     .bar > span { display: block; height: 100%; border-radius: 7px; transition: width .3s; }
-    .bar > span.p-D { background: #1f4e8c; }
-    .bar > span.p-R { background: #a3262a; }
-    .bar > span.p-other { background: #566074; }
+    .bar > span.c-0 { background: var(--cand-1); }
+    .bar > span.c-1 { background: var(--cand-2); }
+    .bar > span.c-2 { background: var(--cand-3); }
     .chart { margin-top: 8px; }
-    .chart svg { width: 100%; height: auto; display: block; background: #fbfcfe; border: 1px solid var(--line); border-radius: 8px; }
+    .chart svg { width: 100%; height: auto; display: block; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
     .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
     .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-    .stale { color: #8a4b00; font-weight: 600; }
+    .stale { color: var(--ink); font-weight: 700; }
     .odds-foot { font-size: .85rem; color: var(--muted); margin-top: 10px; }
     .odds-foot a { color: var(--accent); }
     @media (max-width: 420px) {
@@ -189,7 +195,7 @@
       <p>Names are stored in your browser's local storage on this device only. Clearing your browser data, using private browsing, or pressing "Erase my list" removes them. Other devices and other browsers will not see your list.</p>
     </section>
 
-    <footer>A community project. This page is nonpartisan and does not collect or share any information.</footer>
+    <footer>A community project. This page does not collect or share any information.</footer>
   </main>
 
   <script>
@@ -319,6 +325,10 @@
   <script>
     (function () {
       'use strict';
+      // ---- Page setting: set to false to remove the odds tracker from this page. ----
+      var SHOW_ODDS = true;
+      if (!SHOW_ODDS) return;
+
       var STALE_MS = 60 * 60 * 1000;      // warn if data is older than 1 hour
       var section = document.getElementById('odds');
       var tabsEl = document.getElementById('tabs');
@@ -350,7 +360,9 @@
           .forEach(function (o) { floors[o.i] += 1; });
         return floors;
       }
-      function colorFor(key) { return key === 'D' ? '#1f4e8c' : key === 'R' ? '#a3262a' : '#566074'; }
+      // Candidates are shaded by rank (leader darkest) from the theme, not by party.
+      var css = getComputedStyle(document.documentElement);
+      function colorFor(i) { return css.getPropertyValue('--cand-' + Math.min(i + 1, 3)).trim(); }
 
       function ago(ms) {
         var m = Math.round(ms / 60000);
@@ -374,21 +386,23 @@
         function x(t) { return L + (t - t0) / (t1 - t0) * (W - L - R); }
         function y(p) { return T + (1 - p) * (H - T - B); }
         [0, .25, .5, .75, 1].forEach(function (g) {
-          svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y(g), y2: y(g), stroke: '#d5d9e2', 'stroke-width': 1 }));
-          var lab = svgEl('text', { x: L - 6, y: y(g) + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#566074' });
+          svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: y(g), y2: y(g), stroke: css.getPropertyValue('--line').trim(), 'stroke-width': 1 }));
+          var lab = svgEl('text', { x: L - 6, y: y(g) + 4, 'text-anchor': 'end', 'font-size': 11, fill: css.getPropertyValue('--muted').trim() });
           lab.textContent = Math.round(g * 100) + '%';
           svg.appendChild(lab);
         });
         [t0, t1].forEach(function (t, i) {
           var d = new Date(t * 1000);
-          var lab = svgEl('text', { x: x(t), y: H - 8, 'text-anchor': i ? 'end' : 'start', 'font-size': 11, fill: '#566074' });
+          var lab = svgEl('text', { x: x(t), y: H - 8, 'text-anchor': i ? 'end' : 'start', 'font-size': 11, fill: css.getPropertyValue('--muted').trim() });
           lab.textContent = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
           svg.appendChild(lab);
         });
-        race.candidates.forEach(function (c) {
+        race.candidates.forEach(function (c, ci) {
           if (c.history.length < 2) return;
           var d = c.history.map(function (h, i) { return (i ? 'L' : 'M') + x(h.t).toFixed(1) + ' ' + y(h.p).toFixed(1); }).join(' ');
-          svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: colorFor(c.partyKey), 'stroke-width': 2.5, 'stroke-linejoin': 'round' }));
+          var line = { d: d, fill: 'none', stroke: colorFor(ci), 'stroke-width': 2.5, 'stroke-linejoin': 'round' };
+          if (ci > 0) line['stroke-dasharray'] = '6 4';  // second line stays readable without color
+          svg.appendChild(svgEl('path', line));
         });
         return svg;
       }
@@ -415,7 +429,7 @@
           var bar = el('div', 'bar');
           bar.setAttribute('role', 'img');
           bar.setAttribute('aria-label', c.name + ': ' + (c.chance === null ? 'no price' : whole[ci] + '%'));
-          var fill = el('span', 'p-' + (c.partyKey === 'D' || c.partyKey === 'R' ? c.partyKey : 'other'));
+          var fill = el('span', 'c-' + Math.min(ci, 2));
           fill.style.width = Math.max(0, Math.min(100, (c.chance || 0) * 100)) + '%';
           bar.appendChild(fill);
           wrap.appendChild(bar);
@@ -427,9 +441,9 @@
           var box = el('div', 'chart');
           box.appendChild(svg);
           var legend = el('div', 'legend');
-          race.candidates.forEach(function (c) {
+          race.candidates.forEach(function (c, ci) {
             var item = el('span');
-            var sw = el('i'); sw.style.background = colorFor(c.partyKey);
+            var sw = el('i'); sw.style.background = colorFor(ci);
             item.appendChild(sw);
             item.appendChild(document.createTextNode(c.name));
             legend.appendChild(item);
@@ -448,7 +462,7 @@
         var s = el('span', age > STALE_MS ? 'stale' : '', 'Odds from Kalshi, updated ' + ago(age) + (age > STALE_MS ? ' (may be out of date)' : '') + '. ');
         footEl.appendChild(s);
         footEl.appendChild(document.createTextNode('A market price is not a poll or a prediction anyone guarantees. '));
-        footEl.appendChild(document.createTextNode('Your visit does not contact Kalshi; this page reads a saved copy.'));
+        footEl.appendChild(document.createTextNode('Your visit does not contact Kalshi; this site fetches the odds for you.'));
       }
 
       function init(d) {
@@ -477,7 +491,7 @@
       }
 
       // Failure leaves the section hidden; the checklist above keeps working on its own.
-      fetch('odds.json', { cache: 'no-cache' })
+      fetch('/api/odds', { cache: 'no-cache' })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(init)
         .catch(function () {});
