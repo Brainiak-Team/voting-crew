@@ -1,6 +1,10 @@
 # Changelog
 
-My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
+My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
+
+## 1.0.0 (2026-10-28)
+
+- First stable release. The app is complete and usable: the private list, printing, the flyer, sharing, the issue comparison and the poll tracker, at https://bringyourcrew.com. Same features as 0.13.0; only the version number changes.
 
 ## 0.13.0 "Domain" (2026-10-28)
 
