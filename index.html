@@ -174,6 +174,63 @@
     .dlg-body .fine { color: var(--muted); font-size: .85rem; }
     [hidden] { display: none !important; }
 
+    /* ---- Screens: the page (screen 1) and "More" (screen 2), side by side.
+       One horizontal swipe, or the "More!" hint, slides between them. ---- */
+    .pager { overflow-x: hidden; overflow-x: clip; }
+    .track { display: flex; align-items: flex-start; transition: transform .35s ease; }
+    .screen { flex: 0 0 100%; min-width: 0; }
+    /* The screen out of view is hidden and cut to one screen height, so the
+       page does not keep the other screen's length. */
+    .screen.away { visibility: hidden; max-height: 100vh; overflow: hidden; }
+    /* During a slide, "More" stays in view wherever screen 1 is scrolled to. */
+    .pager.moving .screen-more { position: sticky; top: 0; }
+
+    /* "More!" hint: a vertical word at the right edge of screen 1. Fades in,
+       stays, fades out (about 1.5 s in all), then is gone for 3.5 s. */
+    :root { --hint-w: 26px; }
+    .more-hint {
+      position: fixed; z-index: 5;
+      top: 50%; right: env(safe-area-inset-right, 0px);
+      transform: translateY(-50%);
+      width: var(--hint-w); min-height: 44px; padding: 10px 0;
+      writing-mode: vertical-rl;
+      font: inherit; font-weight: 900; font-size: 1.05rem; letter-spacing: .04em; color: var(--ink);
+      text-shadow: 2px 2px 0 var(--accent);
+      background: none; border: 0; cursor: pointer;
+      opacity: 0;
+      animation: hint-blink 5s linear infinite;
+    }
+    .more-hint:hover, .more-hint:focus-visible { animation: none; opacity: 1; }
+    @keyframes hint-blink {
+      0% { opacity: 0; }
+      6% { opacity: 1; }     /* 0.3 s fade in */
+      24% { opacity: 1; }    /* 0.9 s fully shown */
+      30% { opacity: 0; }    /* 0.3 s fade out, then gone until 5 s */
+      100% { opacity: 0; }
+    }
+    /* Room for the hint, so it never covers a name line or a button. Wide
+       screens already have space beside the page. */
+    @media (max-width: 1019px) {
+      .app { margin-right: calc(var(--hint-w) + env(safe-area-inset-right, 0px)); }
+    }
+
+    /* ---- Screen 2: "More" (placeholder) ---- */
+    .more {
+      max-width: 960px; min-height: 100vh; margin: 0 auto;
+      padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 16px max(14px, env(safe-area-inset-left));
+    }
+    .more-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .more h2 { margin: 0; font-size: clamp(1.7rem, 8.4vw, 3rem); font-weight: 900; line-height: 1.02; letter-spacing: -0.02em; }
+    .more h2:focus { outline: none; }
+    .more p { margin: 0 0 8px; font-size: 1.15rem; font-weight: 600; }
+
+    /* Reduced motion: screens switch without sliding, and the hint stays
+       steadily visible instead of blinking. */
+    @media (prefers-reduced-motion: reduce) {
+      .track { transition: none; }
+      .more-hint { animation: none; opacity: 1; }
+    }
+
     /* Landscape and wide screens: the sketch layout. */
     @media (orientation: landscape) and (min-width: 600px) {
       .app {
@@ -215,7 +272,11 @@
     }
 
     @media print {
-      .side, .foot, .rows-ctl, dialog, label.going { display: none !important; }
+      .side, .foot, .rows-ctl, dialog, label.going, .more-hint, .screen-more { display: none !important; }
+      /* Printing from "More" still prints the list. */
+      .track { transform: none !important; }
+      .screen.away { visibility: visible; max-height: none; overflow: visible; }
+      .app { margin: 0 auto; }
       .app { display: block; border: 0; }
       h1 { font-size: 24pt; margin-bottom: 12pt; }
       ol li { height: 36pt; }
@@ -224,6 +285,9 @@
   </style>
 </head>
 <body>
+  <div class="pager" id="pager">
+  <div class="track" id="track">
+  <div class="screen screen-main" id="screen-main">
   <main class="app">
     <h1><span>Bring your crew.</span> <span>Have an impact!</span></h1>
 
@@ -261,6 +325,24 @@
       </button>
     </div>
   </main>
+  </div>
+
+  <div class="screen screen-more away" id="screen-more" inert aria-hidden="true">
+    <section class="more" aria-labelledby="more-title">
+      <div class="more-head">
+        <button type="button" class="btn" id="more-back" aria-label="Back to your list">&lsaquo; Back</button>
+        <h2 id="more-title" tabindex="-1">More</h2>
+      </div>
+      <!-- ==== PLACEHOLDER: screen 2 content. Replace everything from here ==== -->
+      <p>Coming soon.</p>
+      <!-- ==== to here. Keep the Back button and heading above. ==== -->
+    </section>
+  </div>
+  </div>
+  </div>
+
+  <!-- "More!" hint: opens screen 2 (for mouse and keyboard users too). -->
+  <button type="button" class="more-hint" id="more-open" aria-label="More: open the More screen">More!</button>
 
   <dialog id="privacy" aria-labelledby="privacy-title">
     <div class="dlg-head">
@@ -306,11 +388,11 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.4.0';
+      var VERSION = '0.5.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
-      var MAX = 50;              // most names the "+" button allows
+      var MAX = 40;              // most names the "+" button allows
       var RACE_SECONDS = 15;     // time on each race before switching
       var EXPAND_SECONDS = 5;    // text / arrow swap on the expand button
 
@@ -451,6 +533,102 @@
 
       // "Popular? Expand your list!" swaps with a down arrow.
       setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);
+
+      // ---- Screens: the page (1) and "More" (2) ----
+      // "More" sits to the right of the page. Dragging the page leftward
+      // (finger moving right to left) brings it in; the reverse goes back.
+      var pager = document.getElementById('pager');
+      var track = document.getElementById('track');
+      var screens = [document.getElementById('screen-main'), document.getElementById('screen-more')];
+      var hint = document.getElementById('more-open');
+      var SLIDE_MS = 350;          // matches the .track transition
+      var SWIPE_MIN = 60;          // pixels a swipe must travel to count
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var current = 1;             // screen now shown
+      var pageY = 0;               // where screen 1 was scrolled to
+      var settleTimer;
+
+      // Both screens visible, ready to slide. Screen 1 gets back its length
+      // and its scroll position; "More" stays in view meanwhile.
+      function unsettle() {
+        clearTimeout(settleTimer);
+        if (current === 1) pageY = window.scrollY;
+        pager.classList.add('moving');
+        screens.forEach(function (s) { s.classList.remove('away'); });
+        if (current === 2) window.scrollTo(0, pageY);
+      }
+      // After a slide: the screen out of view is hidden from sight, touch,
+      // keyboard and screen readers.
+      function settle(focusEl) {
+        screens.forEach(function (s, i) {
+          var on = i + 1 === current;
+          s.classList.toggle('away', !on);
+          s.inert = !on;
+          if (on) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
+        });
+        pager.classList.remove('moving');
+        hint.hidden = current !== 1;
+        if (current === 2) window.scrollTo(0, 0);
+        if (focusEl) focusEl.focus({ preventScroll: true });
+      }
+      function showScreen(n, focusEl) {
+        if (!pager.classList.contains('moving')) unsettle();
+        current = n;
+        track.style.transition = '';
+        track.style.transform = n === 2 ? 'translateX(-100%)' : '';
+        settleTimer = setTimeout(function () { settle(focusEl); }, reduceMotion.matches ? 0 : SLIDE_MS);
+      }
+      hint.addEventListener('click', function () { showScreen(2, document.getElementById('more-title')); });
+      document.getElementById('more-back').addEventListener('click', function () { showScreen(1, hint); });
+      // On "More": Escape or the left arrow key goes back.
+      document.addEventListener('keydown', function (e) {
+        if (current !== 2 || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+        if (e.key === 'Escape' || e.key === 'ArrowLeft') { e.preventDefault(); showScreen(1, hint); }
+      });
+
+      // Swipe. Only a clearly sideways, one-finger drag counts: up-and-down
+      // drags scroll the list as usual, and a drag inside a name being typed
+      // or while text is selected is left alone.
+      var touch = null;
+      pager.addEventListener('touchstart', function (e) {
+        touch = null;
+        if (e.touches.length !== 1 || dlg.open) return;
+        var t = e.target;
+        if (t === document.activeElement && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
+        var sel = window.getSelection && window.getSelection();
+        if (sel && !sel.isCollapsed) return;
+        touch = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), dir: '' };
+      }, { passive: true });
+      pager.addEventListener('touchmove', function (e) {
+        if (!touch || e.touches.length !== 1) { touch = null; return; }
+        var dx = e.touches[0].clientX - touch.x, dy = e.touches[0].clientY - touch.y;
+        if (!touch.dir) {
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          // Sideways means at least twice as much across as up or down.
+          touch.dir = Math.abs(dx) > 2 * Math.abs(dy) ? 'x' : 'y';
+          if (touch.dir === 'y') { touch = null; return; }
+          unsettle();
+          track.style.transition = 'none';
+        }
+        if (e.cancelable) e.preventDefault();
+        // The page follows the finger, and resists past either end.
+        if ((current === 1 && dx > 0) || (current === 2 && dx < 0)) dx /= 4;
+        touch.dx = dx;
+        track.style.transform = 'translateX(calc(' + (current === 2 ? '-100%' : '0px') + ' + ' + dx + 'px))';
+      }, { passive: false });
+      function endSwipe() {
+        if (!touch || touch.dir !== 'x') { touch = null; return; }
+        var dx = touch.dx || 0;
+        var fast = Math.abs(dx) > 30 && Math.abs(dx) / (Date.now() - touch.t) > 0.5;
+        var go = Math.abs(dx) > SWIPE_MIN || fast;
+        touch = null;
+        if (go && current === 1 && dx < 0) showScreen(2);
+        else if (go && current === 2 && dx > 0) showScreen(1);
+        else showScreen(current);
+      }
+      pager.addEventListener('touchend', endSwipe);
+      pager.addEventListener('touchcancel', function () { if (touch && touch.dir === 'x') { touch.dx = 0; endSwipe(); } else touch = null; });
 
       // ---- Curved arrows: "Who will you bring to the polls?" ----
       var NS = 'http://www.w3.org/2000/svg';
