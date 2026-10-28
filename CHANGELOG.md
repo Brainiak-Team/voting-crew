@@ -2,6 +2,11 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.12.1 (2026-10-28)
+
+- On desktop, the "More!" hint now sits just to the right of the page box instead of at the far edge of the window, where it was easy to miss.
+- Fixed a stray horizontal scrollbar on desktop, caused by the issue tables' hidden captions escaping the screen clip.
+
 ## 0.12.0 "Issues" (2026-10-28)
 
 - The "More" screen's placeholder is replaced with a side-by-side issue comparison for Governor (Vivek Ramaswamy R vs. Amy Acton D) and U.S. Senate (Jon Husted R vs. Sherrod Brown D). Issues are taken from each race's Republican campaign site; each candidate's own position, including the Democrat's, comes from that candidate's own site. Where a site doesn't address an issue, the cell says so. A table on wider screens, stacked "Issue / R / D" blocks on a phone. Neutral styling throughout, with source links for each race.
