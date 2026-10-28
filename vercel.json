@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/flyer", "destination": "/flyer.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

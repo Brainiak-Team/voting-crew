@@ -2,6 +2,14 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.7.0 "Flyer" (2026-10-28)
+
+- A new page, /flyer: a printable US Letter flyer for a notice board or to hand out. Headline "Bring your crew. Have an impact!", a line inviting people to make their own list of friends to take to the polls, "Election Day: Tuesday, November 3, 2026", "Ohio polls are open 6:30 a.m. to 7:30 p.m.", a QR code to the site, the address in text, and "Names stay on your phone. No sign-up." A "Print this flyer" button on screen, hidden in print, with a link back to the list.
+- The flyer prints full page or two to a page, with a dashed "CUT HERE" line between, matching the blank copies on the list sheet.
+- The QR code is generated locally (the "qrcode" npm package) as inline SVG, error correction level H, with a four-module quiet zone, encoding exactly https://voting-crew-eight.vercel.app/.
+- The print pop-up gets a third choice, "Print a flyer with a QR code", linking to /flyer.
+- The list sheet and blank copies now also print "Ohio polls are open 6:30 a.m. to 7:30 p.m." under the Election Day line, on both the one-page and half-page layouts.
+
 ## 0.6.0 "Print" (2026-10-28)
 
 - "Print a copy!" is now "Print your list!". It opens a small pop-up with two choices: "Print my list" and "Print blank copies for your friends!". The pop-up closes with its Close button, the Escape key, or a tap outside it, and works from the keyboard alone.

@@ -179,6 +179,8 @@
     .print-menu .dlg-body { display: grid; gap: 18px; padding: 16px 16px 20px; }
     .print-menu .dlg-body .btn { width: 100%; text-align: left; }
     .print-menu .fine { margin: 6px 0 0; }
+    /* The flyer option is a link to its own page, dressed as a button. */
+    a.btn { display: block; text-decoration: none; }
 
     /* ---- Printed sheet. Built just before printing and shown only on paper.
        Black ink first, with one red shadow, so it reads in black and white. ---- */
@@ -307,9 +309,11 @@
         border: 1.5pt solid #000; box-shadow: 3pt 3pt 0 #000;
         font-size: 12pt; font-weight: 800;
       }
+      /* Polling hours: under the date box on a full page, beside it on a half. */
+      .s-hours { margin: 7pt 0 0; font-size: 11pt; font-weight: 700; }
       .s-cols {
         display: flex; justify-content: space-between;
-        margin: 14pt 0 0; padding-left: 2.2em;
+        margin: 10pt 0 0; padding-left: 2.2em;
         font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #333;
       }
       .s-list { list-style: none; margin: 0; padding: 0; }
@@ -347,6 +351,8 @@
       .half .s-head { font-size: 22pt; }
       .half .s-sub { margin-top: 4pt; font-size: 11pt; }
       .half .s-date { margin-top: 6pt; padding: 2pt 7pt; font-size: 10pt; }
+      .half .s-when { display: flex; align-items: center; gap: 12pt; }
+      .half .s-hours { margin: 6pt 0 0; font-size: 9.5pt; }
       .half .s-cols { margin-top: 6pt; font-size: 7.5pt; }
       .half .s-list li { height: 21pt; }
       .half .s-num { font-size: 11pt; }
@@ -478,6 +484,10 @@
         <button type="button" class="btn" id="print-blank" aria-describedby="print-blank-note">Print blank copies for your friends!</button>
         <p class="fine" id="print-blank-note">Two empty lists to a page. Cut along the dashed line.</p>
       </div>
+      <div>
+        <a class="btn" id="print-flyer" href="/flyer" aria-describedby="print-flyer-note">Print a flyer with a QR code</a>
+        <p class="fine" id="print-flyer-note">A poster for a notice board, or two to a page to hand out. Opens the flyer page.</p>
+      </div>
     </div>
   </dialog>
 
@@ -488,7 +498,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.6.0';
+      var VERSION = '0.7.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -640,6 +650,7 @@
       // the File menu) prints the visitor's list.
       var SITE = 'https://voting-crew-eight.vercel.app';
       var ELECTION_DAY = 'Tuesday, November 3, 2026';
+      var POLL_HOURS = 'Ohio polls are open 6:30 a.m. to 7:30 p.m.';
       var MINE_LINES = 16;       // lines on "my list": fills one page, at least 10
       var LONG_LINES = 44;       // lines on a list longer than that: fills two pages
       var BLANK_LINES = 10;      // lines on each blank copy
@@ -652,8 +663,9 @@
         if (text !== undefined) n.textContent = text;
         return n;
       }
-      // One copy of the list: headline, election day, numbered lines with a
-      // "Going" box each, and the site address. Names are set as text only.
+      // One copy of the list: headline, election day and polling hours,
+      // numbered lines with a "Going" box each, and the site address. Names
+      // are set as text only.
       function buildCopy(people, lines, half) {
         var copy = sheetEl('section', 'copy' + (half ? ' half' : ''));
         var head = sheetEl('div', 's-head');
@@ -662,7 +674,10 @@
         head.appendChild(sheetEl('span', '', 'Have an impact!'));
         copy.appendChild(head);
         copy.appendChild(sheetEl('p', 's-sub', 'Who will you bring to the polls?'));
-        copy.appendChild(sheetEl('p', 's-date', 'Election Day: ' + ELECTION_DAY));
+        var when = sheetEl('div', 's-when');
+        when.appendChild(sheetEl('p', 's-date', 'Election Day: ' + ELECTION_DAY));
+        when.appendChild(sheetEl('p', 's-hours', POLL_HOURS));
+        copy.appendChild(when);
         var cols = sheetEl('div', 's-cols');
         cols.appendChild(sheetEl('span', '', 'Name'));
         cols.appendChild(sheetEl('span', '', 'Going'));
