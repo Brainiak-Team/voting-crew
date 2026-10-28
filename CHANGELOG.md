@@ -2,6 +2,16 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.6.0 "Print" (2026-10-28)
+
+- "Print a copy!" is now "Print your list!". It opens a small pop-up with two choices: "Print my list" and "Print blank copies for your friends!". The pop-up closes with its Close button, the Escape key, or a tap outside it, and works from the keyboard alone.
+- "Print my list" prints a sheet made for paper, not a copy of the screen: the headline, "Who will you bring to the polls?", "Election Day: Tuesday, November 3, 2026", then your names, numbered, each with a box to tick, and blank lines after them up to sixteen. Names marked "Going" print with the box already ticked. Empty lines between names are closed up. The site's address sits small at the bottom.
+- A list longer than sixteen names prints on two pages, with lines to 44 and no line cut in half.
+- "Print blank copies for your friends!" prints two empty lists to a page, ten lines each, with a dashed "CUT HERE" line between them.
+- The sheet is black and white apart from the red shadow, which prints only when the printer is set to print backgrounds. Odds, buttons, pop-ups and the "More" screen never print.
+- Printing from the browser's own menu (Ctrl+P, File > Print) prints "my list", from either screen.
+- The privacy pop-up now names the button "Print your list!".
+
 ## 0.5.0 "More screen" (2026-10-28)
 
 - A second screen, "More", sits to the right of the page. On a phone, swipe the page from right to left to bring it in, and swipe back the other way to return. Only a clearly sideways swipe counts, so scrolling the list up and down, typing names and selecting text work as before.
