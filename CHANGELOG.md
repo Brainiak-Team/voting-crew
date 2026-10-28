@@ -2,6 +2,11 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.10.0 "Polish" (2026-10-28)
+
+- The "? Privacy" button no longer competes with "Change the odds!" for attention. It's now a small text link with a round "?" mark, tucked beside the heading at every screen size, including when the odds tracker is hidden.
+- A wording and consistency pass across the main page, the More placeholder, both dialogs, the print sheet, the flyer and the 404 page: capitalisation, punctuation and button phrasing were checked against each other. Everything already matched; no wording changes were needed beyond the Privacy button above.
+
 ## 0.9.0 "Sturdy" (2026-10-28)
 
 - On iPhone, a swipe that starts within 24px of the left or right screen edge is left alone, so Safari's own back/forward gesture works there instead of sliding to "More".

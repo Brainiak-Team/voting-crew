@@ -160,7 +160,25 @@
     .rows-ctl { display: flex; gap: 14px; margin: 10px 0 0 2.6em; }
     .rows-ctl .btn { width: 44px; padding: 0; font-size: 1.6rem; line-height: 1; }
     .rows-ctl .btn:disabled { color: #9a9a9a; border-color: #9a9a9a; box-shadow: 4px 4px 0 #dddddd; cursor: default; transform: none; }
-    .info-btn { flex: none; white-space: nowrap; font-size: .9rem; padding: 4px 10px; min-height: 34px; box-shadow: 3px 3px 0 var(--accent); }
+    /* A quiet text link, not a boxed button: it shouldn't compete with
+       "Change the odds!" for attention. The "?" keeps the site's small
+       red-shadowed-badge language without the full button weight. */
+    .privacy-link {
+      flex: none; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 6px;
+      font: inherit; font-weight: 700; font-size: .85rem; color: var(--muted);
+      background: none; border: 0; padding: 6px 2px; min-height: 34px;
+      text-decoration: underline; text-underline-offset: 2px;
+      cursor: pointer;
+    }
+    .privacy-link:hover, .privacy-link:focus-visible { color: var(--ink); }
+    .privacy-link .mark {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--line); box-shadow: 2px 2px 0 var(--accent);
+      font-size: .7rem; font-weight: 900; color: var(--ink); background: var(--bg);
+      text-decoration: none;
+    }
 
     /* ---- Privacy pop-up ---- */
     dialog {
@@ -403,7 +421,7 @@
 
     <div class="side">
       <div class="side-top">
-        <button type="button" class="btn info-btn" id="privacy-open" aria-haspopup="dialog">? Privacy</button>
+        <button type="button" class="privacy-link" id="privacy-open" aria-haspopup="dialog"><span class="mark" aria-hidden="true">?</span>Privacy</button>
         <h2 class="odds-title" id="odds-title" hidden>Change the odds!</h2>
       </div>
       <section class="odds" id="odds" aria-labelledby="odds-title" hidden>
@@ -527,7 +545,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.9.0';
+      var VERSION = '0.10.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
