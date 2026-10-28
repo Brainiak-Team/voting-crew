@@ -10,14 +10,14 @@
   <meta property="og:site_name" content="My Voting Crew">
   <meta property="og:title" content="Bring your crew. Have an impact!">
   <meta property="og:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
-  <meta property="og:url" content="https://voting-crew-eight.vercel.app/">
-  <meta property="og:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <meta property="og:url" content="https://www.bringyourcrew.com/">
+  <meta property="og:image" content="https://www.bringyourcrew.com/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bring your crew. Have an impact!">
   <meta name="twitter:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
-  <meta name="twitter:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <meta name="twitter:image" content="https://www.bringyourcrew.com/og.png">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
@@ -669,7 +669,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.12.2';
+      var VERSION = '0.13.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -819,7 +819,8 @@
       // "Print your list!" offers two sheets: the visitor's own list, or two
       // blank copies to hand out. The browser's own Print command (Ctrl+P,
       // the File menu) prints the visitor's list.
-      var SITE = 'https://voting-crew-eight.vercel.app';
+      var SITE = 'https://www.bringyourcrew.com';   // shared link: the full address
+      var SITE_PRINT = 'bringyourcrew.com';          // printed address: short form
       var ELECTION_DAY = 'Tuesday, November 3, 2026';
       var POLL_HOURS = 'Ohio polls are open 6:30 a.m. to 7:30 p.m.';
       var MINE_LINES = 16;       // lines on "my list": fills one page, at least 10
@@ -864,7 +865,7 @@
         }
         copy.appendChild(list);
         var url = sheetEl('p', 's-url', 'Make your own list: ');
-        url.appendChild(sheetEl('b', '', SITE));
+        url.appendChild(sheetEl('b', '', SITE_PRINT));
         copy.appendChild(url);
         return copy;
       }
