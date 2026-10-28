@@ -188,6 +188,11 @@
     .dlg-body a { color: var(--ink); }
     .dlg-body .fine { color: var(--muted); font-size: .85rem; }
     [hidden] { display: none !important; }
+    .noscript-msg {
+      max-width: 640px; margin: 40px auto; padding: 16px 20px;
+      border: 2px solid var(--line); box-shadow: var(--shadow);
+      font-weight: 700; font-size: 1.05rem; line-height: 1.4;
+    }
 
     /* ---- Print menu: a small pop-up with the two ways to print ---- */
     dialog.print-menu { width: min(420px, calc(100vw - 24px)); }
@@ -386,6 +391,10 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <p class="noscript-msg">This list needs JavaScript to run. Even the blank sheet to print and fill in by hand is built by script, so it can't be printed without JavaScript turned on.</p>
+    <style>#pager { display: none; }</style>
+  </noscript>
   <div class="pager" id="pager">
   <div class="track" id="track">
   <div class="screen screen-main" id="screen-main">
@@ -518,7 +527,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.8.0';
+      var VERSION = '0.9.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -832,9 +841,12 @@
       // drags scroll the list as usual, and a drag inside a name being typed
       // or while text is selected is left alone.
       var touch = null;
+      var EDGE = 24;   // px from either screen edge left to the browser's own back/forward swipe
       pager.addEventListener('touchstart', function (e) {
         touch = null;
         if (e.touches.length !== 1 || dlg.open || printMenu.open) return;
+        var x = e.touches[0].clientX;
+        if (x < EDGE || x > document.documentElement.clientWidth - EDGE) return;
         var t = e.target;
         if (t === document.activeElement && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
         var sel = window.getSelection && window.getSelection();
@@ -970,8 +982,11 @@
           raceEl.appendChild(wrap);
         });
       }
+      var ODDS_MAX_AGE_MS = 60 * 60 * 1000;   // treat odds older than this as unavailable
       function start(data) {
         if (!data || !Array.isArray(data.races) || !data.races.length) return;
+        var age = data.updated ? Date.now() - new Date(data.updated).getTime() : Infinity;
+        if (!(age <= ODDS_MAX_AGE_MS)) return;   // stale (or unparsable): behave as if the fetch had failed
         var i = 0;
         showRace(data.races[0]);
         srcEl.textContent = 'Kalshi market odds.';

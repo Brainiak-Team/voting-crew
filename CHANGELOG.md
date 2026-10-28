@@ -2,6 +2,14 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.9.0 "Sturdy" (2026-10-28)
+
+- On iPhone, a swipe that starts within 24px of the left or right screen edge is left alone, so Safari's own back/forward gesture works there instead of sliding to "More".
+- With JavaScript off, a plain message explains that the list (and even the blank sheet to print) needs it, instead of a broken page.
+- A 404 page in the site's own style, with a link back to the list.
+- The odds tracker now also stays hidden if the data it received is more than an hour old, the same as when the request fails outright.
+- Accessibility pass: checked keyboard focus, input and dialog labelling, and text contrast across the site. All were already in order; no changes were needed beyond what's listed above.
+
 ## 0.8.0 "Share" (2026-10-28)
 
 - Link previews: when the address is pasted into a chat or social post, it now shows a title, description and a preview image (Open Graph and Twitter card tags). The preview image, og.png, is a static 1200x630 picture in the site's own style.
