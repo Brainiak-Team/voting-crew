@@ -669,7 +669,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.12.1';
+      var VERSION = '0.12.2';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -969,6 +969,21 @@
         track.style.transform = n === 2 ? 'translateX(-100%)' : '';
         settleTimer = setTimeout(function () { settle(focusEl); }, reduceMotion.matches ? 0 : SLIDE_MS);
       }
+      // Wide screens: "More!" sits level with the middle of the page box (the
+      // visible part of it), not the middle of the window.
+      var box = document.querySelector('#screen-main .app');
+      var wide = window.matchMedia('(min-width: 1020px)');
+      function placeHint() {
+        if (!wide.matches || !box) { hint.style.top = ''; return; }
+        var r = box.getBoundingClientRect();
+        var top = Math.max(r.top, 0), bottom = Math.min(r.bottom, window.innerHeight);
+        hint.style.top = (bottom > top ? (top + bottom) / 2 : window.innerHeight / 2) + 'px';
+      }
+      placeHint();
+      window.addEventListener('resize', placeHint);
+      window.addEventListener('scroll', placeHint, { passive: true });
+      if (window.ResizeObserver && box) new ResizeObserver(placeHint).observe(box);
+
       hint.addEventListener('click', function () { showScreen(2, document.getElementById('more-title')); });
       document.getElementById('more-back').addEventListener('click', function () { showScreen(1, hint); });
       // On "More": Escape or the left arrow key goes back.
