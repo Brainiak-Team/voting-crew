@@ -36,7 +36,7 @@
       display: grid;
       gap: 10px;
       /* Portrait (phones held upright): stacked. */
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         "head"
         "side"
@@ -94,15 +94,26 @@
       font-size: 1.2rem; font-weight: 800;
       padding-bottom: 6px;
     }
-    ol input {
+    ol input[type="text"] {
       flex: 1; min-width: 0;
       font: inherit; font-size: 1.15rem; font-weight: 600; color: var(--ink);
       border: 0; border-bottom: 2px solid var(--line); border-radius: 0;
       background: transparent;
       padding: 6px 2px 4px;
     }
-    ol input:focus { outline: none; border-bottom-color: var(--accent); }
+    ol input[type="text"]:focus { outline: none; border-bottom-color: var(--accent); }
     ol input::placeholder { color: transparent; }
+    /* "Going" checkbox beside each name. A ticked name is struck through. */
+    label.going {
+      flex: none; display: flex; align-items: center; gap: 6px;
+      align-self: stretch;
+      font-size: .85rem; font-weight: 700; color: var(--muted);
+      cursor: pointer; user-select: none;
+    }
+    label.going input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+    label.going input:disabled { cursor: default; }
+    label.going input:disabled + span { opacity: .45; }
+    ol li.done input[type="text"] { text-decoration: line-through; color: var(--muted); }
 
     /* ---- Buttons (shadowed shapes) ---- */
     .foot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -166,7 +177,7 @@
     /* Landscape and wide screens: the sketch layout. */
     @media (orientation: landscape) and (min-width: 600px) {
       .app {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         /* The odds and arrow column is pinned to the top, so adding names
            only lengthens the left column. Nothing on the right moves. */
         grid-template-rows: auto 1fr auto;
@@ -204,7 +215,7 @@
     }
 
     @media print {
-      .side, .foot, .rows-ctl, dialog { display: none !important; }
+      .side, .foot, .rows-ctl, dialog, label.going { display: none !important; }
       .app { display: block; border: 0; }
       h1 { font-size: 24pt; margin-bottom: 12pt; }
       ol li { height: 36pt; }
@@ -261,10 +272,10 @@
 
       <h3>The names on your list</h3>
       <ul>
-        <li>Names are saved only in this browser, on this device, in its built-in "local storage". They are never uploaded. There is no copy on any server, so no one elsewhere, including the people who run this site, can see them.</li>
+        <li>Names, and which ones are ticked "Going", are saved only in this browser, on this device, in its built-in "local storage". They are never uploaded. There is no copy on any server, so no one elsewhere, including the people who run this site, can see them.</li>
         <li>The page's security settings let it connect only to this website, and the one request it makes (for the race odds) carries no names.</li>
         <li>Your list does not follow you to other devices or browsers. Anyone who uses this browser on this device can open the page and see it.</li>
-        <li>To erase a name, delete its text. To erase everything, clear this site's data in your browser settings. In a private or incognito window, the list is erased when the window closes. Some browsers, Safari included, may clear it on their own if you have not visited the site in about a week.</li>
+        <li>To erase a name, delete its text (its "Going" tick goes with it). To erase everything, clear this site's data in your browser settings. In a private or incognito window, the list is erased when the window closes. Some browsers, Safari included, may clear it on their own if you have not visited the site in about a week.</li>
         <li>Browser extensions you have installed can read the pages you visit, this one included, as on any website.</li>
         <li>"Print a copy!" uses your own browser's print window. Nothing is sent to us.</li>
       </ul>
@@ -313,16 +324,17 @@
       var state = load();
 
       function load() {
-        var s = { names: [], expanded: false };
+        var s = { names: [], going: [], expanded: false };
         try {
           var raw = JSON.parse(localStorage.getItem(KEY) || 'null');
           if (raw && Array.isArray(raw.names)) {
             s.names = raw.names.slice(0, MAX).map(function (n) { return typeof n === 'string' ? n.slice(0, 60) : ''; });
-            s.expanded = raw.expanded === true;
+            s.going = s.names.map(function (n, i) { return Array.isArray(raw.going) && raw.going[i] === true && n.trim() !== ''; });
+            s.expanded = raw.expanded === true && s.names.length > START;
           }
         } catch (e) {}
         var want = START;
-        while (s.names.length < want) s.names.push('');
+        while (s.names.length < want) { s.names.push(''); s.going.push(false); }
         return s;
       }
       function save() {
@@ -339,8 +351,30 @@
         input.setAttribute('autocomplete', 'off');
         input.setAttribute('autocapitalize', 'words');
         input.setAttribute('spellcheck', 'false');
-        input.addEventListener('input', function () { state.names[i] = input.value; save(); updateRowButtons(); });
+        var label = document.createElement('label');
+        label.className = 'going';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.setAttribute('aria-label', 'Name ' + (i + 1) + ' is going');
+        var word = document.createElement('span');
+        word.textContent = 'Going';
+        word.setAttribute('aria-hidden', 'true');
+        label.appendChild(cb);
+        label.appendChild(word);
+        // The box can be ticked only when the line has a name. Erasing the
+        // name clears the tick.
+        function sync() {
+          var named = input.value.trim() !== '';
+          if (!named) state.going[i] = false;
+          cb.disabled = !named;
+          cb.checked = state.going[i] === true;
+          li.className = cb.checked ? 'done' : '';
+        }
+        input.addEventListener('input', function () { state.names[i] = input.value; sync(); save(); updateRowButtons(); });
+        cb.addEventListener('change', function () { state.going[i] = cb.checked; sync(); save(); });
+        sync();
         li.appendChild(input);
+        li.appendChild(label);
         slotsEl.appendChild(li);
         if (focus) input.focus();
       }
@@ -362,7 +396,7 @@
       expandBtn.addEventListener('click', function () {
         state.expanded = true;
         var first = state.names.length;
-        while (state.names.length < EXPANDED) state.names.push('');
+        while (state.names.length < EXPANDED) { state.names.push(''); state.going.push(false); }
         save(); render();
         var inputs = slotsEl.querySelectorAll('input');
         if (inputs[first]) inputs[first].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -370,16 +404,28 @@
       addBtn.addEventListener('click', function () {
         if (state.names.length >= MAX) return;
         state.names.push('');
+        state.going.push(false);
         save();
         addSlot(state.names.length - 1, true);
         updateRowButtons();
       });
+      // Back at five lines, the list returns to its first state and
+      // "Popular? Expand your list!" comes back.
       removeBtn.addEventListener('click', function () {
         var n = state.names.length;
         if (n <= START || state.names[n - 1].trim() !== '') return;
         state.names.pop();
-        save();
+        state.going.pop();
         slotsEl.removeChild(slotsEl.lastElementChild);
+        if (state.names.length <= START) {
+          state.expanded = false;
+          expandBtn.hidden = false;
+          updateRowButtons();
+          save();
+          expandBtn.focus();
+          return;
+        }
+        save();
         updateRowButtons();
         if (removeBtn.disabled) addBtn.focus();
       });
@@ -508,7 +554,7 @@
         if (!data || !Array.isArray(data.races) || !data.races.length) return;
         var i = 0;
         showRace(data.races[0]);
-        srcEl.textContent = 'Kalshi market odds, not a poll.';
+        srcEl.textContent = 'Kalshi market odds.';
         oddsEl.hidden = false;
         document.getElementById('odds-title').hidden = false;
         if (data.races.length < 2) return;

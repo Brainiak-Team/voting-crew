@@ -9,6 +9,9 @@ My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PA
 - Wide screens: the odds and the curved arrow stay in place while lines are added. Only the list grows down the page.
 - Phones held sideways: the page is tightened to fit a short screen without scrolling until the list is expanded.
 - The arrow's label sits further from the arrowhead.
+- "Going" checkboxes are back, one per name. A ticked name is struck through, and the tick is saved with the list. The box is greyed out until its line has a name.
+- When "−" brings the list back to five lines, the "Popular? Expand your list!" prompt returns.
+- The odds source line now reads "Kalshi market odds."
 
 ## 0.3.0 "Bring your crew" (2026-10-27)
 
