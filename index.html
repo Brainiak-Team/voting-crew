@@ -36,11 +36,10 @@
       display: grid;
       gap: 10px;
       /* Portrait (phones held upright): stacked. */
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-areas:
         "head"
-        "odds"
-        "arrow"
+        "side"
         "list"
         "foot";
     }
@@ -54,11 +53,12 @@
     }
     h1 span { display: inline-block; }
 
-    /* ---- Odds ---- */
-    .odds { grid-area: odds; }
+    /* ---- Odds and arrow (one column on wide screens) ---- */
+    .side { grid-area: side; display: grid; gap: 10px; align-content: start; min-width: 0; }
     .odds[hidden] { display: none; }
-    .odds h2 {
-      margin: 0 0 2px;
+    .side-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: -6px; }
+    .odds-title {
+      margin: 0;
       font-size: clamp(1.15rem, 5.4vw, 1.6rem);
       font-weight: 900;
       text-align: right;
@@ -75,7 +75,7 @@
     .odds-src { margin: 2px 0 0; font-size: .68rem; color: var(--muted); text-align: right; }
 
     /* ---- Arrow ---- */
-    .arrow { grid-area: arrow; margin: -4px 0 -6px; }
+    .arrow { margin: -4px 0 -6px; }
     .arrow svg { display: block; width: 100%; height: auto; overflow: visible; }
     .arrow .landscape { display: none; }
     .arrow text { font-family: var(--font); font-weight: 800; fill: var(--ink); }
@@ -94,15 +94,26 @@
       font-size: 1.2rem; font-weight: 800;
       padding-bottom: 6px;
     }
-    ol input {
+    ol input[type="text"] {
       flex: 1; min-width: 0;
       font: inherit; font-size: 1.15rem; font-weight: 600; color: var(--ink);
       border: 0; border-bottom: 2px solid var(--line); border-radius: 0;
       background: transparent;
       padding: 6px 2px 4px;
     }
-    ol input:focus { outline: none; border-bottom-color: var(--accent); }
+    ol input[type="text"]:focus { outline: none; border-bottom-color: var(--accent); }
     ol input::placeholder { color: transparent; }
+    /* "Going" checkbox beside each name. A ticked name is struck through. */
+    label.going {
+      flex: none; display: flex; align-items: center; gap: 6px;
+      align-self: stretch;
+      font-size: .85rem; font-weight: 700; color: var(--muted);
+      cursor: pointer; user-select: none;
+    }
+    label.going input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+    label.going input:disabled { cursor: default; }
+    label.going input:disabled + span { opacity: .45; }
+    ol li.done input[type="text"] { text-decoration: line-through; color: var(--muted); }
 
     /* ---- Buttons (shadowed shapes) ---- */
     .foot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -131,25 +142,56 @@
     .expand .down svg { height: 38px; width: auto; overflow: visible; }
     .expand.flip .say { opacity: 0; }
     .expand.flip .down { opacity: 1; }
-    .add { width: 44px; padding: 0; font-size: 1.6rem; line-height: 1; margin: 10px 0 0 2.6em; }
+    .rows-ctl { display: flex; gap: 14px; margin: 10px 0 0 2.6em; }
+    .rows-ctl .btn { width: 44px; padding: 0; font-size: 1.6rem; line-height: 1; }
+    .rows-ctl .btn:disabled { color: #9a9a9a; border-color: #9a9a9a; box-shadow: 4px 4px 0 #dddddd; cursor: default; transform: none; }
+    .info-btn { flex: none; white-space: nowrap; font-size: .9rem; padding: 4px 10px; min-height: 34px; box-shadow: 3px 3px 0 var(--accent); }
+
+    /* ---- Privacy pop-up ---- */
+    dialog {
+      width: min(640px, calc(100vw - 24px));
+      max-height: calc(100vh - 24px);
+      max-height: calc(100dvh - 24px);
+      padding: 0;
+      overflow: auto;
+      border: 2px solid var(--line);
+      box-shadow: 6px 6px 0 var(--accent);
+      color: var(--ink); background: var(--bg);
+    }
+    dialog::backdrop { background: rgba(0, 0, 0, .45); }
+    .dlg-head {
+      position: sticky; top: 0;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--line);
+    }
+    .dlg-head h2 { margin: 0; font-size: 1.3rem; font-weight: 900; }
+    .dlg-body { padding: 4px 16px 16px; font-size: .95rem; line-height: 1.45; }
+    .dlg-body h3 { margin: 16px 0 4px; font-size: 1rem; font-weight: 800; }
+    .dlg-body p, .dlg-body ul { margin: 0 0 8px; }
+    .dlg-body ul { padding-left: 1.2em; }
+    .dlg-body li { margin-bottom: 4px; }
+    .dlg-body a { color: var(--ink); }
+    .dlg-body .fine { color: var(--muted); font-size: .85rem; }
     [hidden] { display: none !important; }
 
     /* Landscape and wide screens: the sketch layout. */
     @media (orientation: landscape) and (min-width: 600px) {
       .app {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto 1fr auto;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        /* The odds and arrow column is pinned to the top, so adding names
+           only lengthens the left column. Nothing on the right moves. */
+        grid-template-rows: auto 1fr auto;
         grid-template-areas:
           "head head"
-          "list odds"
-          "list arrow"
-          "foot arrow";
+          "list side"
+          "foot side";
         column-gap: 28px;
         border: 2px solid var(--line);
         margin-top: 12px;
       }
       h1 { font-size: clamp(1.6rem, 4.2vw, 3rem); }
-      .arrow { margin: 0 0 0 -40%; align-self: end; justify-self: end; }
+      .side { align-self: start; }
+      .arrow { margin: 0 0 0 -40%; justify-self: end; }
       .arrow svg.landscape { width: auto; height: min(36vh, 230px); }
       .arrow .portrait { display: none; }
       .arrow .landscape { display: block; }
@@ -157,8 +199,23 @@
       .list li { height: clamp(34px, 9vh, 46px); }
     }
 
+    /* Phones held sideways: tighten so the whole page fits the short screen. */
+    @media (orientation: landscape) and (min-width: 600px) and (max-height: 500px) {
+      .app { margin-top: 0; border-top: 0; padding-top: 6px; padding-bottom: 8px; row-gap: 6px; }
+      h1 { font-size: clamp(1.4rem, 3.4vw, 2rem); }
+      .side { gap: 4px; }
+      .side-top { margin-bottom: 0; }
+      .odds-title { font-size: 1.15rem; }
+      .race-label { margin-bottom: 2px; }
+      .cand { margin-bottom: 3px; }
+      .arrow svg.landscape { height: min(28vh, 230px); }
+      .list li { height: 34px; }
+      .btn { min-height: 40px; padding-top: 4px; padding-bottom: 4px; }
+      .expand { min-height: 40px; }
+    }
+
     @media print {
-      .odds, .arrow, .foot, .add { display: none !important; }
+      .side, .foot, .rows-ctl, dialog, label.going { display: none !important; }
       .app { display: block; border: 0; }
       h1 { font-size: 24pt; margin-bottom: 12pt; }
       ol li { height: 36pt; }
@@ -170,20 +227,28 @@
   <main class="app">
     <h1><span>Bring your crew.</span> <span>Have an impact!</span></h1>
 
-    <section class="odds" id="odds" aria-label="Race odds" hidden>
-      <h2>Change the odds!</h2>
-      <div class="race" id="race" aria-live="polite"></div>
-      <p class="odds-src" id="odds-src"></p>
-    </section>
+    <div class="side">
+      <div class="side-top">
+        <button type="button" class="btn info-btn" id="privacy-open" aria-haspopup="dialog">? Privacy</button>
+        <h2 class="odds-title" id="odds-title" hidden>Change the odds!</h2>
+      </div>
+      <section class="odds" id="odds" aria-labelledby="odds-title" hidden>
+        <div class="race" id="race" aria-live="polite"></div>
+        <p class="odds-src" id="odds-src"></p>
+      </section>
 
-    <div class="arrow" aria-hidden="true">
-      <svg class="portrait" id="arrow-p" viewBox="0 0 400 120"></svg>
-      <svg class="landscape" id="arrow-l" viewBox="0 0 420 210"></svg>
+      <div class="arrow" aria-hidden="true">
+        <svg class="portrait" id="arrow-p" viewBox="0 0 400 120"></svg>
+        <svg class="landscape" id="arrow-l" viewBox="0 0 420 210"></svg>
+      </div>
     </div>
 
     <section class="list" aria-label="Who will you bring to the polls?">
       <ol id="slots"></ol>
-      <button type="button" class="btn add" id="add" aria-label="Add another name" hidden>+</button>
+      <div class="rows-ctl" id="rows-ctl" hidden>
+        <button type="button" class="btn" id="add" aria-label="Add a name line">+</button>
+        <button type="button" class="btn" id="remove" aria-label="Remove the last empty name line">&minus;</button>
+      </div>
     </section>
 
     <div class="foot">
@@ -197,10 +262,51 @@
     </div>
   </main>
 
+  <dialog id="privacy" aria-labelledby="privacy-title">
+    <div class="dlg-head">
+      <h2 id="privacy-title">Your privacy</h2>
+      <button type="button" class="btn" id="privacy-close">Close</button>
+    </div>
+    <div class="dlg-body">
+      <p>Short version: the names you type stay on your device. This site has no accounts, no cookies, no ads and no tracking, and it never sends your list anywhere.</p>
+
+      <h3>The names on your list</h3>
+      <ul>
+        <li>Names, and which ones are ticked "Going", are saved only in this browser, on this device, in its built-in "local storage". They are never uploaded. There is no copy on any server, so no one elsewhere, including the people who run this site, can see them.</li>
+        <li>The page's security settings let it connect only to this website, and the one request it makes (for the race odds) carries no names.</li>
+        <li>Your list does not follow you to other devices or browsers. Anyone who uses this browser on this device can open the page and see it.</li>
+        <li>To erase a name, delete its text (its "Going" tick goes with it). To erase everything, clear this site's data in your browser settings. In a private or incognito window, the list is erased when the window closes. Some browsers, Safari included, may clear it on their own if you have not visited the site in about a week.</li>
+        <li>Browser extensions you have installed can read the pages you visit, this one included, as on any website.</li>
+        <li>"Print a copy!" uses your own browser's print window. Nothing is sent to us.</li>
+      </ul>
+
+      <h3>What this site does not do</h3>
+      <ul>
+        <li>No accounts, sign-ups, emails or phone numbers.</li>
+        <li>No cookies, analytics, advertising, tracking pixels or social media buttons.</li>
+        <li>No outside scripts, fonts or images. Everything comes from this one site.</li>
+        <li>No access to your camera, microphone or location. The site blocks itself from asking.</li>
+        <li>When you follow a link away from this site, your browser is told not to reveal that you came from here.</li>
+      </ul>
+
+      <h3>The race odds</h3>
+      <p>The odds come from Kalshi, a prediction market. This website's own server asks Kalshi for them and reuses each answer for every visitor for about 10 minutes. Your browser never contacts Kalshi, and Kalshi never learns who you are or that you visited.</p>
+
+      <h3>What the web host sees</h3>
+      <p>This site is hosted by Vercel. As with any website, loading the page means your browser connects to Vercel's servers, which receive basic technical details: your IP address (a rough indication of location), your browser and device type, the time, and the page requested. Vercel uses this to deliver the site and protect it from attacks, and keeps it under its own <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. Vercel's dashboard also shows the site's operators recent request records containing these details. They never include your list, and this site adds no analytics or tracking of its own. The connection is encrypted (HTTPS).</p>
+
+      <h3>Check it yourself</h3>
+      <p>The complete code for this site is public on <a href="https://github.com/Brainiak-Team/voting-crew" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+
+      <p class="fine">Version <span id="version"></span>. If the way this site handles privacy changes, this notice will change with it.</p>
+    </div>
+  </dialog>
+
   <script>
     (function () {
       'use strict';
       // ---- Page settings ----
+      var VERSION = '0.4.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -211,21 +317,24 @@
       var KEY = 'votingCrew.v2';
       var slotsEl = document.getElementById('slots');
       var addBtn = document.getElementById('add');
+      var removeBtn = document.getElementById('remove');
+      var rowsCtl = document.getElementById('rows-ctl');
       var expandBtn = document.getElementById('expand');
       var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
       var state = load();
 
       function load() {
-        var s = { names: [], expanded: false };
+        var s = { names: [], going: [], expanded: false };
         try {
           var raw = JSON.parse(localStorage.getItem(KEY) || 'null');
           if (raw && Array.isArray(raw.names)) {
             s.names = raw.names.slice(0, MAX).map(function (n) { return typeof n === 'string' ? n.slice(0, 60) : ''; });
-            s.expanded = raw.expanded === true;
+            s.going = s.names.map(function (n, i) { return Array.isArray(raw.going) && raw.going[i] === true && n.trim() !== ''; });
+            s.expanded = raw.expanded === true && s.names.length > START;
           }
         } catch (e) {}
-        var want = s.expanded ? Math.max(EXPANDED, s.names.length) : START;
-        while (s.names.length < want) s.names.push('');
+        var want = START;
+        while (s.names.length < want) { s.names.push(''); s.going.push(false); }
         return s;
       }
       function save() {
@@ -242,22 +351,52 @@
         input.setAttribute('autocomplete', 'off');
         input.setAttribute('autocapitalize', 'words');
         input.setAttribute('spellcheck', 'false');
-        input.addEventListener('input', function () { state.names[i] = input.value; save(); });
+        var label = document.createElement('label');
+        label.className = 'going';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.setAttribute('aria-label', 'Name ' + (i + 1) + ' is going');
+        var word = document.createElement('span');
+        word.textContent = 'Going';
+        word.setAttribute('aria-hidden', 'true');
+        label.appendChild(cb);
+        label.appendChild(word);
+        // The box can be ticked only when the line has a name. Erasing the
+        // name clears the tick.
+        function sync() {
+          var named = input.value.trim() !== '';
+          if (!named) state.going[i] = false;
+          cb.disabled = !named;
+          cb.checked = state.going[i] === true;
+          li.className = cb.checked ? 'done' : '';
+        }
+        input.addEventListener('input', function () { state.names[i] = input.value; sync(); save(); updateRowButtons(); });
+        cb.addEventListener('change', function () { state.going[i] = cb.checked; sync(); save(); });
+        sync();
         li.appendChild(input);
+        li.appendChild(label);
         slotsEl.appendChild(li);
         if (focus) input.focus();
+      }
+      // "+" adds a line up to MAX. "−" removes the last line only when it is
+      // empty, and never goes below START lines.
+      function updateRowButtons() {
+        var n = state.names.length;
+        rowsCtl.hidden = !state.expanded;
+        addBtn.disabled = n >= MAX;
+        removeBtn.disabled = n <= START || state.names[n - 1].trim() !== '';
       }
       function render() {
         slotsEl.textContent = '';
         state.names.forEach(function (_, i) { addSlot(i); });
         expandBtn.hidden = state.expanded;
-        addBtn.hidden = !state.expanded || state.names.length >= MAX;
+        updateRowButtons();
       }
 
       expandBtn.addEventListener('click', function () {
         state.expanded = true;
         var first = state.names.length;
-        while (state.names.length < EXPANDED) state.names.push('');
+        while (state.names.length < EXPANDED) { state.names.push(''); state.going.push(false); }
         save(); render();
         var inputs = slotsEl.querySelectorAll('input');
         if (inputs[first]) inputs[first].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -265,11 +404,50 @@
       addBtn.addEventListener('click', function () {
         if (state.names.length >= MAX) return;
         state.names.push('');
+        state.going.push(false);
         save();
         addSlot(state.names.length - 1, true);
-        addBtn.hidden = state.names.length >= MAX;
+        updateRowButtons();
+      });
+      // Back at five lines, the list returns to its first state and
+      // "Popular? Expand your list!" comes back.
+      removeBtn.addEventListener('click', function () {
+        var n = state.names.length;
+        if (n <= START || state.names[n - 1].trim() !== '') return;
+        state.names.pop();
+        state.going.pop();
+        slotsEl.removeChild(slotsEl.lastElementChild);
+        if (state.names.length <= START) {
+          state.expanded = false;
+          expandBtn.hidden = false;
+          updateRowButtons();
+          save();
+          expandBtn.focus();
+          return;
+        }
+        save();
+        updateRowButtons();
+        if (removeBtn.disabled) addBtn.focus();
       });
       document.getElementById('print').addEventListener('click', function () { window.print(); });
+
+      // ---- Privacy pop-up ----
+      var dlg = document.getElementById('privacy');
+      document.getElementById('version').textContent = VERSION;
+      document.getElementById('privacy-open').addEventListener('click', function () {
+        if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+        dlg.scrollTop = 0;
+      });
+      document.getElementById('privacy-close').addEventListener('click', function () {
+        if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
+      });
+      // A tap on the dimmed area around the pop-up closes it.
+      // (Checked by position, so dragging the pop-up's own scrollbar does not close it.)
+      dlg.addEventListener('click', function (e) {
+        if (e.target !== dlg || !dlg.close) return;
+        var r = dlg.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
+      });
 
       // "Popular? Expand your list!" swaps with a down arrow.
       setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);
@@ -283,7 +461,7 @@
       }
       // Draws a thick curved band ending in an arrowhead, with a red offset shadow,
       // and the label written along the band (on a left-to-right copy of the curve).
-      function drawArrow(svg, d, textD, width, fontSize) {
+      function drawArrow(svg, d, textD, width, fontSize, textAt) {
         var probe = svgEl('path', { d: d });
         svg.appendChild(probe);
         var len = probe.getTotalLength();
@@ -312,7 +490,7 @@
         defs.appendChild(svgEl('path', { id: id, d: textD }));
         svg.appendChild(defs);
         var text = svgEl('text', { 'font-size': fontSize, 'dominant-baseline': 'central' });
-        var tp = svgEl('textPath', { href: '#' + id, startOffset: '50%', 'text-anchor': 'middle' });
+        var tp = svgEl('textPath', { href: '#' + id, startOffset: (textAt || 50) + '%', 'text-anchor': 'middle' });
         tp.textContent = 'Who will you bring to the polls?';
         text.appendChild(tp);
         svg.appendChild(text);
@@ -324,7 +502,7 @@
       // Landscape: sweeps from bottom right up toward the list on the left.
       drawArrow(document.getElementById('arrow-l'),
         'M396 112 C 330 200, 130 200, 70 92',
-        'M72 92 C 130 200, 330 200, 398 108', 36, 18);
+        'M72 92 C 130 200, 330 200, 398 108', 36, 18, 55);
 
       render();
 
@@ -376,8 +554,9 @@
         if (!data || !Array.isArray(data.races) || !data.races.length) return;
         var i = 0;
         showRace(data.races[0]);
-        srcEl.textContent = 'Kalshi market odds, not a poll.';
+        srcEl.textContent = 'Kalshi market odds.';
         oddsEl.hidden = false;
+        document.getElementById('odds-title').hidden = false;
         if (data.races.length < 2) return;
         setInterval(function () {
           raceEl.classList.add('fade');

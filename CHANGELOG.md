@@ -2,6 +2,17 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.4.0 "Privacy and list controls" (2026-10-27)
+
+- "? Privacy" button, beside "Change the odds!", opens a pop-up that explains in full how the site treats privacy: where names are kept and how to erase them, what the site does not do, how the odds reach the page without visitors contacting Kalshi, and what the web host (Vercel) sees. Closes with its button, the Escape key, or a tap outside it.
+- "−" button beside "+": removes the last line when it is empty. Never goes below five lines. Greyed out when there is nothing it may remove.
+- Wide screens: the odds and the curved arrow stay in place while lines are added. Only the list grows down the page.
+- Phones held sideways: the page is tightened to fit a short screen without scrolling until the list is expanded.
+- The arrow's label sits further from the arrowhead.
+- "Going" checkboxes are back, one per name. A ticked name is struck through, and the tick is saved with the list. The box is greyed out until its line has a name.
+- When "−" brings the list back to five lines, the "Popular? Expand your list!" prompt returns.
+- The odds source line now reads "Kalshi market odds."
+
 ## 0.3.0 "Bring your crew" (2026-10-27)
 
 Redesign from Mainiak's sketch, in Republican red. The plain base stays on the `base-monochrome` branch.
