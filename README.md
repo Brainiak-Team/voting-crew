@@ -18,4 +18,4 @@ An Election Day checklist: list the friends you will take to the polls (five lin
 
 ## Hosting
 
-Hosted on Vercel, on Mainiak's own account: https://voting-crew-eight.vercel.app. The project is **not Git-linked** — pushing to the repo does not deploy anything. Deploys are run from the command line via the Vercel REST API, from a tagged commit. The older address, https://voting-crew.vercel.app, still serves an earlier build from the Kangaroof team and has not yet been cleaned up.
+Hosted on Vercel, on Mainiak's own account, at https://bringyourcrew.com (forwards to www; DNS at Namecheap). The Vercel address https://voting-crew-eight.vercel.app still works, so older flyers' QR codes keep scanning. votingcrew.com is a spare alias. The project is **not Git-linked** — pushing to the repo does not deploy anything. Deploys are run from the command line via the Vercel REST API, from a tagged commit. The older address, https://voting-crew.vercel.app, still serves an earlier build from the Kangaroof team and has not yet been cleaned up.

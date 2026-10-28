@@ -2,6 +2,14 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.13.0 "Domain" (2026-10-28)
+
+- The site has its own address: https://bringyourcrew.com (Mainiak's domain, bought on Namecheap). It forwards to https://www.bringyourcrew.com. The old address, https://voting-crew-eight.vercel.app, keeps working, so flyers already printed still scan.
+- The flyer's QR code now encodes https://www.bringyourcrew.com/ (same settings: error correction level H, four-module quiet zone), and the flyer prints the short address "bringyourcrew.com".
+- The list sheet and blank copies print "bringyourcrew.com" at the bottom. The Share button shares https://www.bringyourcrew.com.
+- Link previews point to the new address, and the preview picture, og.png, is redrawn to show bringyourcrew.com.
+- votingcrew.com, also Mainiak's, loads the same site but is not printed or shared anywhere.
+
 ## 0.12.2 (2026-10-28)
 
 - On desktop, the "More!" hint now lines up with the middle of the page box instead of the middle of the window, so it no longer floats below the box on tall windows.
