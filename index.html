@@ -81,6 +81,7 @@
     .race { transition: opacity .35s; }
     .race.fade { opacity: 0; }
     .race-label { margin: 0 0 4px; font-size: .8rem; color: var(--muted); text-align: right; text-transform: uppercase; letter-spacing: .06em; }
+    .race-poll { margin: 4px 0 0; font-size: .7rem; color: var(--muted); text-align: right; }
     .cand { margin: 0 0 6px; }
     .cand-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 800; }
     .cand-head .pct { font-variant-numeric: tabular-nums; }
@@ -273,6 +274,48 @@
     .more h2 { margin: 0; font-size: clamp(1.7rem, 8.4vw, 3rem); font-weight: 900; line-height: 1.02; letter-spacing: -0.02em; }
     .more h2:focus { outline: none; }
     .more p { margin: 0 0 8px; font-size: 1.15rem; font-weight: 600; }
+    .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    .more .cmp-note { margin: 0 0 22px; font-size: .9rem; font-weight: 500; color: var(--muted); max-width: 46em; }
+    .cmp-race { margin: 0 0 30px; max-width: 900px; }
+    .cmp-race h3 { margin: 0 0 10px; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; }
+    .cmp-sources { margin: 10px 0 0; font-size: .82rem; color: var(--muted); }
+    .cmp-sources a { color: var(--ink); }
+    /* Issue comparison table: stacked "Issue / R / D" blocks by default, so
+       long sentences stay readable on a phone; a real table once there's
+       room for three columns side by side. Neutral: no party coloring. */
+    table.cmp { width: 100%; border-collapse: collapse; margin: 0; }
+    table.cmp, table.cmp thead, table.cmp tbody, table.cmp tr, table.cmp th, table.cmp td { display: block; }
+    table.cmp thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+    table.cmp tr { border: 2px solid var(--line); box-shadow: var(--shadow); margin: 0 0 16px; padding: 12px 14px; }
+    table.cmp th[scope="row"] {
+      font-size: 1.02rem; font-weight: 800; text-align: left;
+      padding: 0 0 8px; margin: 0 0 8px; border-bottom: 1.5px solid var(--line);
+    }
+    table.cmp td { padding: 8px 0 0; font-size: .92rem; font-weight: 500; line-height: 1.45; }
+    table.cmp td:first-of-type { padding-top: 0; }
+    table.cmp td::before {
+      content: attr(data-label) ":"; display: block; margin: 0 0 2px;
+      font-size: .72rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    table.cmp td.na { color: var(--muted); font-style: italic; }
+    @media (min-width: 720px) {
+      table.cmp { table-layout: fixed; display: table; }
+      table.cmp tbody { display: table-row-group; }
+      table.cmp thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+      table.cmp tr { display: table-row; border: 0; box-shadow: none; margin: 0; padding: 0; }
+      table.cmp th, table.cmp td {
+        display: table-cell; border: 1.5px solid var(--line);
+        padding: 10px 12px; vertical-align: top; text-align: left;
+      }
+      /* First column (the issue name) stays narrow; the two candidate
+         columns split the rest evenly. */
+      table.cmp th:first-child, table.cmp td:first-child { width: 20%; }
+      table.cmp thead th { font-weight: 800; font-size: .85rem; }
+      table.cmp th[scope="row"] { border-bottom: 1.5px solid var(--line); padding: 10px 12px; margin: 0; }
+      table.cmp td { font-size: .88rem; padding-top: 10px; }
+      table.cmp td::before { content: none; display: none; }
+    }
 
     /* Reduced motion: screens switch without sliding, and the hint stays
        steadily visible instead of blinking. */
@@ -461,9 +504,84 @@
         <button type="button" class="btn" id="more-back" aria-label="Back to your list">&lsaquo; Back</button>
         <h2 id="more-title" tabindex="-1">More</h2>
       </div>
-      <!-- ==== PLACEHOLDER: screen 2 content. Replace everything from here ==== -->
-      <p>Coming soon.</p>
-      <!-- ==== to here. Keep the Back button and heading above. ==== -->
+      <p>Where the candidates stand, issue by issue.</p>
+      <p class="cmp-note">Issues below are taken from each race's Republican candidate's own campaign site. Each candidate's position &mdash; including the Democratic candidate's &mdash; is drawn from that candidate's own campaign site; a dash means the site did not address it.</p>
+
+      <section class="cmp-race" aria-labelledby="cmp-gov-title">
+        <h3 id="cmp-gov-title">Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)</h3>
+        <table class="cmp">
+          <caption class="vh">Issue comparison, Governor race</caption>
+          <thead>
+            <tr><th scope="col">Issue</th><th scope="col">Vivek Ramaswamy (R)</th><th scope="col">Amy Acton (D)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" data-label="Issue">Taxes</th>
+              <td data-label="Vivek Ramaswamy (R)">Wants to cut property taxes right away and phase out Ohio's income tax, starting with eliminating the capital-gains tax.</td>
+              <td data-label="Amy Acton (D)">Says her top priority is a tax cut for working families: an earned-income credit plus new child tax credits.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Energy costs &amp; business climate</th>
+              <td data-label="Vivek Ramaswamy (R)">Would expand natural gas and new energy technology, streamline permitting, and cut regulations to lower electric bills and draw industry.</td>
+              <td data-label="Amy Acton (D)">Would lower bills by adding low-cost, clean power and naming utility regulators who favor ratepayers over utility companies.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Education</th>
+              <td data-label="Vivek Ramaswamy (R)">Would raise academic standards, expand parental choice in schooling, pay top teachers more, and grow career-technical education.</td>
+              <td data-label="Amy Acton (D)">Would restore public school funding to the state's constitutional level and keep public funding for public schools only.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Crime &amp; public safety</th>
+              <td data-label="Vivek Ramaswamy (R)">Would toughen bail and sentencing for repeat violent offenders and back police to act quickly against crime.</td>
+              <td data-label="Amy Acton (D)">Would fully fund police and first responders and invest in mental-health and addiction treatment alongside law enforcement.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Political tone (&ldquo;One Ohio&rdquo;)</th>
+              <td data-label="Vivek Ramaswamy (R)">Frames his campaign as restoring respectful political discourse and uniting Ohioans around shared, common-sense values over partisan division.</td>
+              <td data-label="Amy Acton (D)" class="na">Not addressed on campaign site.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Data centers</th>
+              <td data-label="Vivek Ramaswamy (R)">Pledges free electricity for residents near data centers, mandatory full tax payment plus homeowner rebates, and strict environmental rules.</td>
+              <td data-label="Amy Acton (D)">Would require data centers to cover 100% of their own utility costs, use union labor, and meet strict environmental/transparency rules.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="cmp-sources">Sources: <a href="https://vivekforohio.com/the-plan" target="_blank" rel="noopener noreferrer">Ramaswamy (R)</a> &middot; <a href="https://actonforgovernor.com/issues" target="_blank" rel="noopener noreferrer">Acton (D)</a></p>
+      </section>
+
+      <section class="cmp-race" aria-labelledby="cmp-sen-title">
+        <h3 id="cmp-sen-title">U.S. Senate: Jon Husted (R) vs. Sherrod Brown (D)</h3>
+        <table class="cmp">
+          <caption class="vh">Issue comparison, U.S. Senate race</caption>
+          <thead>
+            <tr><th scope="col">Issue</th><th scope="col">Jon Husted (R)</th><th scope="col">Sherrod Brown (D)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" data-label="Issue">Jobs &amp; economic development</th>
+              <td data-label="Jon Husted (R)">Points to helping land Ohio's largest-ever economic development deal (Intel's chip plant) and creating job-training programs like TechCred.</td>
+              <td data-label="Sherrod Brown (D)">Site criticizes past corporate tax breaks and trade deals for having shipped Ohio jobs overseas, without naming a current jobs plan.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Taxes &amp; government efficiency</th>
+              <td data-label="Jon Husted (R)">Says he founded InnovateOhio to cut government waste, and backed what was at the time the state's largest income-tax cut.</td>
+              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Life / values</th>
+              <td data-label="Jon Husted (R)">Describes himself as a lifelong "champion for life," a stance he connects to his own adoption out of foster care.</td>
+              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
+            </tr>
+            <tr>
+              <th scope="row" data-label="Issue">Law enforcement &amp; public safety</th>
+              <td data-label="Jon Husted (R)">Says he backs police and helped secure millions of dollars in funding for law-enforcement agencies.</td>
+              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="cmp-sources">Sources: <a href="https://www.jonhustedforsenate.com/bio/" target="_blank" rel="noopener noreferrer">Husted (R)</a> &middot; <a href="https://www.sherrodbrown.com/our-fight/" target="_blank" rel="noopener noreferrer">Brown (D)</a></p>
+      </section>
     </section>
   </div>
   </div>
@@ -483,7 +601,7 @@
       <h3>The names on your list</h3>
       <ul>
         <li>Names, and which ones are ticked "Going", are saved only in this browser, on this device, in its built-in "local storage". They are never uploaded. There is no copy on any server, so no one elsewhere, including the people who run this site, can see them.</li>
-        <li>The page's security settings let it connect only to this website, and the one request it makes (for the race odds) carries no names.</li>
+        <li>The page's security settings let it connect only to this website, and the one request it makes (for the race polling) carries no names.</li>
         <li>Your list does not follow you to other devices or browsers. Anyone who uses this browser on this device can open the page and see it.</li>
         <li>To erase a name, delete its text (its "Going" tick goes with it). To erase everything, clear this site's data in your browser settings. In a private or incognito window, the list is erased when the window closes. Some browsers, Safari included, may clear it on their own if you have not visited the site in about a week.</li>
         <li>Browser extensions you have installed can read the pages you visit, this one included, as on any website.</li>
@@ -499,8 +617,8 @@
         <li>When you follow a link away from this site, your browser is told not to reveal that you came from here.</li>
       </ul>
 
-      <h3>The race odds</h3>
-      <p>The odds come from Kalshi, a prediction market. This website's own server asks Kalshi for them and reuses each answer for every visitor for about 10 minutes. Your browser never contacts Kalshi, and Kalshi never learns who you are or that you visited.</p>
+      <h3>The race polling</h3>
+      <p>The poll numbers come from VoteHub, a free public archive of political polls (Fox News's own polls, run by Beacon Research/Shaw &amp; Co. Research). This website's own server asks VoteHub for them and reuses each answer for every visitor for about an hour. Your browser never contacts VoteHub, and VoteHub never learns who you are or that you visited.</p>
 
       <h3>What the web host sees</h3>
       <p>This site is hosted by Vercel. As with any website, loading the page means your browser connects to Vercel's servers, which receive basic technical details: your IP address (a rough indication of location), your browser and device type, the time, and the page requested. Vercel uses this to deliver the site and protect it from attacks, and keeps it under its own <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>. Vercel's dashboard also shows the site's operators recent request records containing these details. They never include your list, and this site adds no analytics or tracking of its own. The connection is encrypted (HTTPS).</p>
@@ -545,7 +663,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.11.0';
+      var VERSION = '0.12.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -968,46 +1086,38 @@
         if (text !== undefined) n.textContent = text;
         return n;
       }
-      // Whole-number percents that always add to 100 (largest-remainder method).
-      function wholePercents(list) {
-        var raw = list.map(function (c) { return c.chance === null ? 0 : c.chance * 100; });
-        var floors = raw.map(Math.floor);
-        var left = 100 - floors.reduce(function (a, b) { return a + b; }, 0);
-        raw.map(function (v, i) { return { i: i, r: v - Math.floor(v) }; })
-          .sort(function (a, b) { return b.r - a.r || a.i - b.i; })
-          .slice(0, Math.max(0, left))
-          .forEach(function (o) { floors[o.i] += 1; });
-        return floors;
-      }
       function showRace(race) {
         var cands = race.candidates.slice().sort(function (a, b) {
           return (b.partyKey === 'R') - (a.partyKey === 'R');
         });
-        var whole = wholePercents(cands);
         raceEl.textContent = '';
         raceEl.appendChild(el('p', 'race-label', race.label + (race.subtitle && race.subtitle !== 'Ohio' ? ' · ' + race.subtitle : ' · Ohio')));
-        cands.forEach(function (c, i) {
+        cands.forEach(function (c) {
           var wrap = el('div', 'cand');
           var head = el('div', 'cand-head');
           head.appendChild(el('span', '', c.name));
-          head.appendChild(el('span', 'pct', c.chance === null ? '—' : whole[i] + '%'));
+          head.appendChild(el('span', 'pct', typeof c.pct === 'number' ? c.pct + '%' : '—'));
           wrap.appendChild(head);
           var bar = el('div', 'bar');
           var fill = el('span', c.partyKey === 'R' ? 'rep' : '');
-          fill.style.width = (c.chance === null ? 0 : whole[i]) + '%';
+          fill.style.width = (typeof c.pct === 'number' ? c.pct : 0) + '%';
           bar.appendChild(fill);
           wrap.appendChild(bar);
           raceEl.appendChild(wrap);
         });
+        if (race.fieldwork) {
+          var poll = 'Latest Fox News poll: ' + race.fieldwork + (race.sample ? ' · ' + race.sample : '');
+          raceEl.appendChild(el('p', 'race-poll', poll));
+        }
       }
-      var ODDS_MAX_AGE_MS = 60 * 60 * 1000;   // treat odds older than this as unavailable
+      // Staleness here means the fetch itself failed (or returned nothing
+      // usable) — polls are weeks old by nature, so their age is not a sign
+      // of a problem the way it would be for a live market.
       function start(data) {
         if (!data || !Array.isArray(data.races) || !data.races.length) return;
-        var age = data.updated ? Date.now() - new Date(data.updated).getTime() : Infinity;
-        if (!(age <= ODDS_MAX_AGE_MS)) return;   // stale (or unparsable): behave as if the fetch had failed
         var i = 0;
         showRace(data.races[0]);
-        srcEl.textContent = 'Kalshi market odds.';
+        srcEl.textContent = data.credit || 'Fox News poll, via VoteHub.';
         oddsEl.hidden = false;
         document.getElementById('odds-title').hidden = false;
         if (data.races.length < 2) return;

@@ -1,12 +1,15 @@
 // Vercel server function: GET /api/odds
-// Fetches Ohio race odds from Kalshi's public market-data API (no API key).
-// Runs on Vercel's servers, so visitors' browsers never contact Kalshi.
-// Vercel's cache keeps each answer for 10 minutes, so Kalshi is asked at most
-// about once every 10 minutes no matter how many people visit.
+// Fetches Ohio race polling from VoteHub's public polls API (no API key),
+// filtered down to the Fox News-commissioned polls (run by the bipartisan
+// pair Beacon Research/Shaw & Co. Research, tagged with sponsor "Fox News").
+// Runs on Vercel's servers, so visitors' browsers never contact VoteHub.
+// Vercel's cache keeps each answer for an hour, so VoteHub is asked at most
+// about once an hour no matter how many people visit.
 
-const BASE = 'https://external-api.kalshi.com/trade-api/v2';
-const HISTORY_DAYS = 30;
-const CACHE_SECONDS = 600;
+const BASE = 'https://api.votehub.com/polls';
+const CACHE_SECONDS = 3600;
+const SUBJECT = '2026 Ohio';
+const SPONSOR = 'Fox News';
 
 // Add a race here and it appears as a new tab. Nothing else needs to change.
 const RACES = [
@@ -14,119 +17,111 @@ const RACES = [
     id: 'senate',
     label: 'U.S. Senate',
     subtitle: 'Ohio special election',
-    series: 'SENATEOHS',
-    // Which party each market ticker belongs to (suffix after the last dash).
-    parties: { D: 'Democratic', R: 'Republican' },
+    pollType: 'us-senator',
+    parties: { 'Jon Husted': { party: 'Republican', partyKey: 'R' }, 'Sherrod Brown': { party: 'Democratic', partyKey: 'D' } },
   },
   {
     id: 'governor',
     label: 'Governor',
     subtitle: 'Ohio',
-    series: 'GOVPARTYOH',
-    parties: { D: 'Democratic', R: 'Republican' },
+    pollType: 'governor',
+    parties: { 'Vivek Ramaswamy': { party: 'Republican', partyKey: 'R' }, 'Amy Acton': { party: 'Democratic', partyKey: 'D' } },
   },
 ];
 
-async function getJson(path) {
-  const res = await fetch(BASE + path, { headers: { accept: 'application/json' } });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${path}`);
-  return res.json();
+const MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const POPULATION = { rv: 'registered voters', lv: 'likely voters', a: 'adults', v: 'voters' };
+
+// "2026-10-15".."2026-10-19" -> "Oct 15-19, 2026". Different months/years
+// spell out both ends: "Oct 30 - Nov 2, 2026".
+function fieldworkRange(startStr, endStr) {
+  const start = new Date(startStr + 'T00:00:00Z');
+  const end = new Date(endStr + 'T00:00:00Z');
+  const sameMonth = start.getUTCFullYear() === end.getUTCFullYear() && start.getUTCMonth() === end.getUTCMonth();
+  const startPart = `${MONTH[start.getUTCMonth()]} ${start.getUTCDate()}`;
+  const endPart = sameMonth ? `${end.getUTCDate()}` : `${MONTH[end.getUTCMonth()]} ${end.getUTCDate()}`;
+  return `${startPart}–${endPart}, ${end.getUTCFullYear()}`;
 }
 
-const num = (s) => (s === null || s === undefined || s === '' ? null : Number(s));
-
-// Midpoint of bid/ask is a steadier "implied chance" than last trade on thin markets.
-function impliedChance(m) {
-  const bid = num(m.yes_bid_dollars);
-  const ask = num(m.yes_ask_dollars);
-  if (bid !== null && ask !== null && ask > 0) return (bid + ask) / 2;
-  return num(m.last_price_dollars);
+function sampleLine(poll) {
+  if (!poll.sample_size) return null;
+  const who = POPULATION[poll.population] || 'respondents';
+  return `${poll.sample_size.toLocaleString('en-US')} ${who}`;
 }
 
-async function getHistory(race, m, start, now) {
-  try {
-    const c = await getJson(
-      `/series/${race.series}/markets/${m.ticker}/candlesticks` +
-        `?start_ts=${start}&end_ts=${now}&period_interval=1440`
-    );
-    return (c.candlesticks || [])
-      .map((k) => {
-        const bid = num(k.yes_bid?.close_dollars);
-        const ask = num(k.yes_ask?.close_dollars);
-        const p = bid !== null && ask !== null ? (bid + ask) / 2 : num(k.price?.close_dollars);
-        return p === null ? null : { t: k.end_period_ts, p: Math.round(p * 1000) / 1000 };
-      })
-      .filter(Boolean);
-  } catch (e) {
-    console.error(`history failed for ${m.ticker}: ${e.message}`);
-    return [];
-  }
-}
-
-async function buildRace(race) {
-  const { markets } = await getJson(`/markets?series_ticker=${race.series}&limit=100`);
-  const open = markets.filter((m) => m.status === 'active');
-  if (open.length === 0) throw new Error(`no active markets for ${race.series}`);
-
-  const now = Math.floor(Date.now() / 1000);
-  const start = now - HISTORY_DAYS * 86400;
-
-  const candidates = await Promise.all(
-    open.map(async (m) => {
-      const partyKey = m.ticker.split('-').pop();
-      const chance = impliedChance(m);
-      return {
-        ticker: m.ticker,
-        name: m.yes_sub_title,
-        party: race.parties[partyKey] || partyKey,
-        partyKey,
-        chance: chance === null ? null : Math.round(chance * 1000) / 1000,
-        bid: num(m.yes_bid_dollars),
-        ask: num(m.yes_ask_dollars),
-        resolves: m.rules_primary,
-        history: await getHistory(race, m, start, now),
-      };
-    })
+function buildRace(race, polls) {
+  const matches = polls.filter(
+    (p) => p.subject === SUBJECT && p.poll_type === race.pollType && Array.isArray(p.sponsors) && p.sponsors.includes(SPONSOR)
   );
-  // Each side's midpoint can add to 99-101%. Scale to 100 so the page never
-  // shows a total that looks like a mistake. Raw bid/ask stay in the data.
-  const total = candidates.reduce((t, c) => t + (c.chance ?? 0), 0);
-  if (total > 0 && candidates.every((c) => c.chance !== null)) {
-    for (const c of candidates) c.chance = Math.round((c.chance / total) * 1000) / 1000;
-  }
-  candidates.sort((a, b) => (b.chance ?? 0) - (a.chance ?? 0));
+  if (matches.length === 0) throw new Error(`no Fox News poll found for ${race.id}`);
+  // Most recent fieldwork wins.
+  matches.sort((a, b) => (a.end_date < b.end_date ? 1 : a.end_date > b.end_date ? -1 : 0));
+  const poll = matches[0];
+
+  const candidates = Object.keys(race.parties)
+    .map((name) => {
+      const answer = (poll.answers || []).find((a) => a.choice === name);
+      if (!answer) return null;
+      return { name, ...race.parties[name], pct: answer.pct };
+    })
+    .filter(Boolean);
+  if (candidates.length === 0) throw new Error(`no matching candidates for ${race.id}`);
 
   return {
     id: race.id,
     label: race.label,
     subtitle: race.subtitle,
-    series: race.series,
-    closes: open[0].close_time,
+    pollster: poll.pollster,
+    fieldwork: fieldworkRange(poll.start_date, poll.end_date),
+    sample: sampleLine(poll),
+    url: poll.url,
     candidates,
   };
 }
 
 export async function GET() {
-  const results = await Promise.allSettled(RACES.map(buildRace));
-  // Keep going: one failed race should not blank the others.
+  let polls;
+  try {
+    const res = await fetch(BASE, { headers: { accept: 'application/json' } });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    polls = await res.json();
+    if (!Array.isArray(polls)) throw new Error('unexpected response shape');
+  } catch (e) {
+    console.error(`votehub fetch failed: ${e.message}`);
+    return Response.json({ error: 'poll data unavailable' }, {
+      status: 502,
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  }
+
+  // Keep going: one race missing a Fox News poll should not blank the others.
   const races = [];
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') races.push(r.value);
-    else console.error(`skipping ${RACES[i].id}: ${r.reason?.message}`);
-  });
+  for (const race of RACES) {
+    try {
+      races.push(buildRace(race, polls));
+    } catch (e) {
+      console.error(`skipping ${race.id}: ${e.message}`);
+    }
+  }
   if (races.length === 0) {
-    return Response.json({ error: 'odds unavailable' }, {
+    return Response.json({ error: 'poll data unavailable' }, {
       status: 502,
       headers: { 'Cache-Control': 'no-store' },
     });
   }
   return Response.json(
-    { updated: new Date().toISOString(), source: 'Kalshi', races },
+    {
+      updated: new Date().toISOString(),
+      source: 'VoteHub',
+      credit: 'Fox News poll (Beacon Research/Shaw & Co.), via VoteHub (CC BY 4.0)',
+      races,
+    },
     {
       headers: {
-        // Browsers re-ask every time; Vercel's cache answers for 10 minutes,
-        // then serves the old copy while it fetches a fresh one.
-        'Cache-Control': `public, max-age=0, s-maxage=${CACHE_SECONDS}, stale-while-revalidate=3000`,
+        // Browsers re-ask every time; Vercel's cache answers for an hour,
+        // then serves the old copy while it fetches a fresh one. Polls move
+        // slowly, so an hour-old number is never materially wrong.
+        'Cache-Control': `public, max-age=0, s-maxage=${CACHE_SECONDS}, stale-while-revalidate=21600`,
       },
     }
   );
