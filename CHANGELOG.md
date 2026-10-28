@@ -2,6 +2,11 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.12.0 "Issues" (2026-10-28)
+
+- The "More" screen's placeholder is replaced with a side-by-side issue comparison for Governor (Vivek Ramaswamy R vs. Amy Acton D) and U.S. Senate (Jon Husted R vs. Sherrod Brown D). Issues are taken from each race's Republican campaign site; each candidate's own position, including the Democrat's, comes from that candidate's own site. Where a site doesn't address an issue, the cell says so. A table on wider screens, stacked "Issue / R / D" blocks on a phone. Neutral styling throughout, with source links for each race.
+- The race tracker now shows polling instead of a prediction market: `api/odds.mjs` reads Fox News's Ohio polls (run by Beacon Research/Shaw & Co. Research) from VoteHub's free public polls API, replacing Kalshi. The tracker shows "Latest Fox News poll," the fieldwork dates and sample size, and credits "Fox News poll (Beacon Research/Shaw & Co.), via VoteHub (CC BY 4.0)." Cached for an hour, since polls don't move minute to minute. The tracker still hides itself if the fetch fails; poll age no longer counts as staleness, since a poll is expected to be weeks old.
+
 ## 0.11.0 "Release candidate" (2026-10-28)
 
 - README.md brought up to date: full feature list, the /flyer page, and hosting details (Mainiak's own Vercel account, deployed from the command line via the REST API, not Git-linked).
