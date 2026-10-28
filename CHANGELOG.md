@@ -10,6 +10,7 @@ My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PA
 - Visitors who ask their device for reduced motion get no sliding: the screens switch at once, and "More!" stays in view without blinking.
 - "Print a copy!" still prints the headline and names only, from either screen.
 - The "+" button now stops at 40 lines (was 50). A saved list longer than 40 is shortened to 40.
+- Hosting moved to Mainiak's own Vercel account. The site now lives at https://voting-crew-eight.vercel.app and is deployed from the command line, not from GitHub. The old address, voting-crew.vercel.app, stays on the Kangaroof account until that project is deleted.
 
 ## 0.4.0 "Privacy and list controls" (2026-10-27)
 

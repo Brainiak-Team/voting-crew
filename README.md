@@ -8,4 +8,4 @@ An Election Day checklist: list the friends you will take to the polls (five lin
 - Optional Ohio race odds tracker. Turn it off by setting `SHOW_ODDS = false` in the settings block at the top of the `<script>` in `index.html`.
 - Odds come from `api/odds.mjs`, a Vercel server function that reads Kalshi's public API (no key) and is cached for 10 minutes. Visitors' browsers never contact Kalshi. Add or remove races in its `RACES` list.
 
-Hosted on Vercel.
+Hosted on Vercel (Mainiak's account): https://voting-crew-eight.vercel.app. Vercel is not connected to this repo. Deploys are run from the command line, from a pushed and tagged commit.
