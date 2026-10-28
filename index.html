@@ -227,7 +227,8 @@
 
     /* ---- Screens: the page (screen 1) and "More" (screen 2), side by side.
        One horizontal swipe, or the "More!" hint, slides between them. ---- */
-    .pager { overflow-x: hidden; overflow-x: clip; }
+    /* Positioned, so the clip also holds in the absolutely placed captions. */
+    .pager { position: relative; overflow-x: hidden; overflow-x: clip; }
     .track { display: flex; align-items: flex-start; transition: transform .35s ease; }
     .screen { flex: 0 0 100%; min-width: 0; }
     /* The screen out of view is hidden and cut to one screen height, so the
@@ -263,6 +264,11 @@
        screens already have space beside the page. */
     @media (max-width: 1019px) {
       .app { margin-right: calc(var(--hint-w) + env(safe-area-inset-right, 0px)); }
+    }
+    /* Wide screens: the hint sits just right of the page box, not at the far
+       edge of the window where nobody looks. */
+    @media (min-width: 1020px) {
+      .more-hint { right: calc(50% - 480px - var(--hint-w) - 10px); }
     }
 
     /* ---- Screen 2: "More" (placeholder) ---- */
@@ -663,7 +669,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.12.0';
+      var VERSION = '0.12.1';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
