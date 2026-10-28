@@ -174,6 +174,16 @@
     .dlg-body .fine { color: var(--muted); font-size: .85rem; }
     [hidden] { display: none !important; }
 
+    /* ---- Print menu: a small pop-up with the two ways to print ---- */
+    dialog.print-menu { width: min(420px, calc(100vw - 24px)); }
+    .print-menu .dlg-body { display: grid; gap: 18px; padding: 16px 16px 20px; }
+    .print-menu .dlg-body .btn { width: 100%; text-align: left; }
+    .print-menu .fine { margin: 6px 0 0; }
+
+    /* ---- Printed sheet. Built just before printing and shown only on paper.
+       Black ink first, with one red shadow, so it reads in black and white. ---- */
+    .sheet { display: none; }
+
     /* ---- Screens: the page (screen 1) and "More" (screen 2), side by side.
        One horizontal swipe, or the "More!" hint, slides between them. ---- */
     .pager { overflow-x: hidden; overflow-x: clip; }
@@ -271,16 +281,86 @@
       .expand { min-height: 40px; }
     }
 
+    /* Paper: only the sheet prints, from either screen. One US Letter page,
+       or more for a long list, never splitting a line across pages. */
+    @page { size: letter portrait; margin: 0.5in; }
     @media print {
-      .side, .foot, .rows-ctl, dialog, label.going, .more-hint, .screen-more { display: none !important; }
-      /* Printing from "More" still prints the list. */
-      .track { transform: none !important; }
-      .screen.away { visibility: visible; max-height: none; overflow: visible; }
-      .app { margin: 0 auto; }
-      .app { display: block; border: 0; }
-      h1 { font-size: 24pt; margin-bottom: 12pt; }
-      ol li { height: 36pt; }
-      ol input { font-size: 16pt; }
+      body > :not(.sheet) { display: none !important; }
+      body { background: #fff; }
+      .sheet { display: block; color: #000; font-size: 12pt; }
+      .copy {
+        position: relative;
+        border: 2pt solid #000;
+        padding: 22pt 26pt 14pt;
+        /* Keep the red shadow even when "background graphics" is off. */
+        box-shadow: 5pt 5pt 0 var(--accent);
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        margin-right: 5pt;
+        /* A list that runs onto a second page gets its frame on both. */
+        -webkit-box-decoration-break: clone; box-decoration-break: clone;
+      }
+      .s-head { margin: 0; font-size: 34pt; font-weight: 900; line-height: 1.02; letter-spacing: -0.02em; }
+      .s-head span { display: inline-block; }
+      .s-sub { margin: 8pt 0 0; font-size: 15pt; font-weight: 800; font-style: italic; }
+      .s-date {
+        display: inline-block; margin: 10pt 0 0; padding: 3pt 9pt;
+        border: 1.5pt solid #000; box-shadow: 3pt 3pt 0 #000;
+        font-size: 12pt; font-weight: 800;
+      }
+      .s-cols {
+        display: flex; justify-content: space-between;
+        margin: 14pt 0 0; padding-left: 2.2em;
+        font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #333;
+      }
+      .s-list { list-style: none; margin: 0; padding: 0; }
+      .s-list li::before { content: none; }
+      .s-list li {
+        display: flex; align-items: flex-end; gap: 8pt;
+        height: 30pt;
+        break-inside: avoid; page-break-inside: avoid;
+      }
+      .s-num { width: 1.6em; flex: none; text-align: right; font-size: 13pt; font-weight: 800; padding-bottom: 3pt; }
+      .s-name {
+        flex: 1; min-width: 0;
+        border-bottom: 1.5pt solid #000; padding: 0 2pt 3pt;
+        font-size: 14pt; font-weight: 600;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      /* "Going" box, drawn with borders (borders always print). */
+      .s-box { flex: none; position: relative; width: 15pt; height: 15pt; margin: 0 6pt 3pt 4pt; border: 1.5pt solid #000; }
+      .s-box.on::after {
+        content: ""; position: absolute; left: 4pt; top: 0;
+        width: 4pt; height: 9pt;
+        border: solid #000; border-width: 0 2.5pt 2.5pt 0;
+        transform: rotate(40deg);
+      }
+      /* A list too long for one page: shorter lines, and the frame drawn
+         on each page without the shadow (which some browsers smear across
+         the page break). */
+      .copy.long { box-shadow: none; }
+      .long .s-list li { height: 26pt; }
+      .s-url { margin: 14pt 0 0; font-size: 8.5pt; color: #333; text-align: center; }
+      .s-url b { color: #000; }
+
+      /* Blank copies: two half-page copies to a sheet, with a cut line. */
+      .copy.half { height: 4.66in; padding: 14pt 20pt 10pt; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+      .half .s-head { font-size: 22pt; }
+      .half .s-sub { margin-top: 4pt; font-size: 11pt; }
+      .half .s-date { margin-top: 6pt; padding: 2pt 7pt; font-size: 10pt; }
+      .half .s-cols { margin-top: 6pt; font-size: 7.5pt; }
+      .half .s-list li { height: 21pt; }
+      .half .s-num { font-size: 11pt; }
+      .half .s-url { margin-top: 6pt; font-size: 7.5pt; }
+      .cut {
+        position: relative; height: 0.6in; margin: 0 -0.5in;
+        break-inside: avoid; page-break-inside: avoid;
+      }
+      .cut::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.2pt dashed #000; }
+      .cut span {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        padding: 0 8pt; background: #fff; font-size: 8pt; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
     }
   </style>
 </head>
@@ -316,7 +396,7 @@
     </section>
 
     <div class="foot">
-      <button type="button" class="btn" id="print">Print a copy!</button>
+      <button type="button" class="btn" id="print" aria-haspopup="dialog">Print your list!</button>
       <button type="button" class="expand" id="expand" aria-label="Popular? Expand your list to ten names">
         <span class="say">Popular? Expand your list!</span>
         <span class="down" aria-hidden="true">
@@ -359,7 +439,7 @@
         <li>Your list does not follow you to other devices or browsers. Anyone who uses this browser on this device can open the page and see it.</li>
         <li>To erase a name, delete its text (its "Going" tick goes with it). To erase everything, clear this site's data in your browser settings. In a private or incognito window, the list is erased when the window closes. Some browsers, Safari included, may clear it on their own if you have not visited the site in about a week.</li>
         <li>Browser extensions you have installed can read the pages you visit, this one included, as on any website.</li>
-        <li>"Print a copy!" uses your own browser's print window. Nothing is sent to us.</li>
+        <li>"Print your list!" uses your own browser's print window. Nothing is sent to us.</li>
       </ul>
 
       <h3>What this site does not do</h3>
@@ -384,11 +464,31 @@
     </div>
   </dialog>
 
+  <dialog id="print-menu" class="print-menu" aria-labelledby="print-menu-title">
+    <div class="dlg-head">
+      <h2 id="print-menu-title">Print</h2>
+      <button type="button" class="btn" id="print-menu-close">Close</button>
+    </div>
+    <div class="dlg-body">
+      <div>
+        <button type="button" class="btn" id="print-mine" aria-describedby="print-mine-note" autofocus>Print my list</button>
+        <p class="fine" id="print-mine-note">Your names, each with a box to tick, and room for more.</p>
+      </div>
+      <div>
+        <button type="button" class="btn" id="print-blank" aria-describedby="print-blank-note">Print blank copies for your friends!</button>
+        <p class="fine" id="print-blank-note">Two empty lists to a page. Cut along the dashed line.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- What goes on paper. Filled in just before printing; never shown on screen. -->
+  <div class="sheet" id="sheet" aria-hidden="true"></div>
+
   <script>
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.5.0';
+      var VERSION = '0.6.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -511,25 +611,113 @@
         updateRowButtons();
         if (removeBtn.disabled) addBtn.focus();
       });
-      document.getElementById('print').addEventListener('click', function () { window.print(); });
-
-      // ---- Privacy pop-up ----
+      // ---- Pop-ups (Privacy and Print) ----
       var dlg = document.getElementById('privacy');
+      var printMenu = document.getElementById('print-menu');
+      function openDialog(d) {
+        if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+        d.scrollTop = 0;
+      }
+      function closeDialog(d) {
+        if (d.close) d.close(); else d.removeAttribute('open');
+      }
+      [dlg, printMenu].forEach(function (d) {
+        // A tap on the dimmed area around the pop-up closes it.
+        // (Checked by position, so dragging the pop-up's own scrollbar does not close it.)
+        d.addEventListener('click', function (e) {
+          if (e.target !== d || !d.close) return;
+          var r = d.getBoundingClientRect();
+          if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+        });
+      });
       document.getElementById('version').textContent = VERSION;
-      document.getElementById('privacy-open').addEventListener('click', function () {
-        if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
-        dlg.scrollTop = 0;
+      document.getElementById('privacy-open').addEventListener('click', function () { openDialog(dlg); });
+      document.getElementById('privacy-close').addEventListener('click', function () { closeDialog(dlg); });
+
+      // ---- Printing ----
+      // "Print your list!" offers two sheets: the visitor's own list, or two
+      // blank copies to hand out. The browser's own Print command (Ctrl+P,
+      // the File menu) prints the visitor's list.
+      var SITE = 'https://voting-crew-eight.vercel.app';
+      var ELECTION_DAY = 'Tuesday, November 3, 2026';
+      var MINE_LINES = 16;       // lines on "my list": fills one page, at least 10
+      var LONG_LINES = 44;       // lines on a list longer than that: fills two pages
+      var BLANK_LINES = 10;      // lines on each blank copy
+      var sheet = document.getElementById('sheet');
+      var sheetReady = false;    // a sheet was built for the print about to happen
+
+      function sheetEl(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined) n.textContent = text;
+        return n;
+      }
+      // One copy of the list: headline, election day, numbered lines with a
+      // "Going" box each, and the site address. Names are set as text only.
+      function buildCopy(people, lines, half) {
+        var copy = sheetEl('section', 'copy' + (half ? ' half' : ''));
+        var head = sheetEl('div', 's-head');
+        head.appendChild(sheetEl('span', '', 'Bring your crew.'));
+        head.appendChild(document.createTextNode(' '));
+        head.appendChild(sheetEl('span', '', 'Have an impact!'));
+        copy.appendChild(head);
+        copy.appendChild(sheetEl('p', 's-sub', 'Who will you bring to the polls?'));
+        copy.appendChild(sheetEl('p', 's-date', 'Election Day: ' + ELECTION_DAY));
+        var cols = sheetEl('div', 's-cols');
+        cols.appendChild(sheetEl('span', '', 'Name'));
+        cols.appendChild(sheetEl('span', '', 'Going'));
+        copy.appendChild(cols);
+        var list = sheetEl('ol', 's-list');
+        for (var i = 0; i < Math.max(lines, people.length); i++) {
+          var p = people[i];
+          var li = sheetEl('li');
+          li.appendChild(sheetEl('span', 's-num', (i + 1) + '.'));
+          li.appendChild(sheetEl('span', 's-name', p ? p.name : ''));
+          li.appendChild(sheetEl('span', 's-box' + (p && p.going ? ' on' : '')));
+          list.appendChild(li);
+        }
+        copy.appendChild(list);
+        var url = sheetEl('p', 's-url', 'Make your own list: ');
+        url.appendChild(sheetEl('b', '', SITE));
+        copy.appendChild(url);
+        return copy;
+      }
+      // "mine": the names typed so far, in order, gaps closed up, then blank
+      // lines. "blank": two empty half-page copies with a cut line between.
+      function buildSheet(kind) {
+        sheet.textContent = '';
+        if (kind === 'blank') {
+          sheet.appendChild(buildCopy([], BLANK_LINES, true));
+          var cut = sheetEl('div', 'cut');
+          cut.appendChild(sheetEl('span', '', 'Cut here'));
+          sheet.appendChild(cut);
+          sheet.appendChild(buildCopy([], BLANK_LINES, true));
+          return;
+        }
+        var people = [];
+        state.names.forEach(function (n, i) {
+          if (n.trim() !== '') people.push({ name: n.trim(), going: state.going[i] === true });
+        });
+        var long = people.length > MINE_LINES;
+        var copy = buildCopy(people, long ? LONG_LINES : MINE_LINES, false);
+        if (long) copy.classList.add('long');
+        sheet.appendChild(copy);
+      }
+      function printSheet(kind) {
+        closeDialog(printMenu);
+        buildSheet(kind);
+        sheetReady = true;
+        window.print();
+      }
+      // The browser's own Print command, from either screen: the visitor's list.
+      window.addEventListener('beforeprint', function () {
+        if (!sheetReady) buildSheet('mine');
+        sheetReady = false;
       });
-      document.getElementById('privacy-close').addEventListener('click', function () {
-        if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
-      });
-      // A tap on the dimmed area around the pop-up closes it.
-      // (Checked by position, so dragging the pop-up's own scrollbar does not close it.)
-      dlg.addEventListener('click', function (e) {
-        if (e.target !== dlg || !dlg.close) return;
-        var r = dlg.getBoundingClientRect();
-        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
-      });
+      document.getElementById('print').addEventListener('click', function () { openDialog(printMenu); });
+      document.getElementById('print-menu-close').addEventListener('click', function () { closeDialog(printMenu); });
+      document.getElementById('print-mine').addEventListener('click', function () { printSheet('mine'); });
+      document.getElementById('print-blank').addEventListener('click', function () { printSheet('blank'); });
 
       // "Popular? Expand your list!" swaps with a down arrow.
       setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);
@@ -583,6 +771,7 @@
       // On "More": Escape or the left arrow key goes back.
       document.addEventListener('keydown', function (e) {
         if (current !== 2 || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        if (dlg.open || printMenu.open) return;   // Escape closes the pop-up only
         if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.key === 'Escape' || e.key === 'ArrowLeft') { e.preventDefault(); showScreen(1, hint); }
       });
@@ -593,7 +782,7 @@
       var touch = null;
       pager.addEventListener('touchstart', function (e) {
         touch = null;
-        if (e.touches.length !== 1 || dlg.open) return;
+        if (e.touches.length !== 1 || dlg.open || printMenu.open) return;
         var t = e.target;
         if (t === document.activeElement && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
         var sel = window.getSelection && window.getSelection();
@@ -683,6 +872,7 @@
         'M72 92 C 130 200, 330 200, 398 108', 36, 18, 55);
 
       render();
+      buildSheet('mine');
 
       // ---- Odds: rotates between races, Republican always on top ----
       if (!SHOW_ODDS) return;
