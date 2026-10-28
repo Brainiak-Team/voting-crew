@@ -2,6 +2,11 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.11.0 "Release candidate" (2026-10-28)
+
+- README.md brought up to date: full feature list, the /flyer page, and hosting details (Mainiak's own Vercel account, deployed from the command line via the REST API, not Git-linked).
+- A 1.0 readiness checklist, listing what's built, what still needs Mainiak's decision (More screen content, the poll-source question, swipe-direction confirmation, real-phone testing, old-address cleanup), and a hand-test list for a real phone.
+
 ## 0.10.0 "Polish" (2026-10-28)
 
 - The "? Privacy" button no longer competes with "Change the odds!" for attention. It's now a small text link with a round "?" mark, tucked beside the heading at every screen size, including when the odds tracker is hidden.
