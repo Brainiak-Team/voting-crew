@@ -2,6 +2,15 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.5.0 "More screen" (2026-10-28)
+
+- A second screen, "More", sits to the right of the page. On a phone, swipe the page from right to left to bring it in, and swipe back the other way to return. Only a clearly sideways swipe counts, so scrolling the list up and down, typing names and selecting text work as before.
+- A small upright "More!" at the right edge of the page fades in, stays about one and a half seconds, then is gone for three and a half, every five seconds. Tapping or clicking it opens "More". On "More", a "Back" button returns to the page, as do the Escape and left arrow keys.
+- "More" holds a placeholder ("Coming soon.") until its design is ready.
+- Visitors who ask their device for reduced motion get no sliding: the screens switch at once, and "More!" stays in view without blinking.
+- "Print a copy!" still prints the headline and names only, from either screen.
+- The "+" button now stops at 40 lines (was 50). A saved list longer than 40 is shortened to 40.
+
 ## 0.4.0 "Privacy and list controls" (2026-10-27)
 
 - "? Privacy" button, beside "Change the odds!", opens a pop-up that explains in full how the site treats privacy: where names are kept and how to erase them, what the site does not do, how the odds reach the page without visitors contacting Kalshi, and what the web host (Vercel) sees. Closes with its button, the Escape key, or a tap outside it.

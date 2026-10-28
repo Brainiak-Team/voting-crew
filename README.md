@@ -1,6 +1,6 @@
 # My Voting Crew
 
-An Election Day checklist: list the friends you will take to the polls (five lines, expandable to 50).
+An Election Day checklist: list the friends you will take to the polls (five lines, expandable to 40).
 
 - One page (`index.html`), no build step, no dependencies.
 - Names are stored only in the visitor's browser (local storage). No accounts, no analytics, nothing sent anywhere. The "? Privacy" pop-up explains this to visitors; update its text in `index.html` if anything about data handling changes.
