@@ -2,6 +2,10 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.12.2 (2026-10-28)
+
+- On desktop, the "More!" hint now lines up with the middle of the page box instead of the middle of the window, so it no longer floats below the box on tall windows.
+
 ## 0.12.1 (2026-10-28)
 
 - On desktop, the "More!" hint now sits just to the right of the page box instead of at the far edge of the window, where it was easy to miss.
