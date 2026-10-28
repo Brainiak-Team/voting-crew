@@ -5,7 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bring your crew. Have an impact!</title>
   <meta name="description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src data:; base-uri 'none'; form-action 'none'">
+  <!-- Link previews (Open Graph + Twitter card). og:image is a static file, 1200x630. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="My Voting Crew">
+  <meta property="og:title" content="Bring your crew. Have an impact!">
+  <meta property="og:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
+  <meta property="og:url" content="https://voting-crew-eight.vercel.app/">
+  <meta property="og:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bring your crew. Have an impact!">
+  <meta name="twitter:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
+  <meta name="twitter:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <style>
     /* ---- Theme. Restyle a copy of this page by editing these values. ---- */
@@ -488,6 +503,11 @@
         <a class="btn" id="print-flyer" href="/flyer" aria-describedby="print-flyer-note">Print a flyer with a QR code</a>
         <p class="fine" id="print-flyer-note">A poster for a notice board, or two to a page to hand out. Opens the flyer page.</p>
       </div>
+      <div>
+        <button type="button" class="btn" id="share" aria-describedby="share-note">Share</button>
+        <p class="fine" id="share-note">Sends the site's address only &mdash; never your names.</p>
+        <p class="fine" id="share-status" role="status" aria-live="polite" hidden>Link copied!</p>
+      </div>
     </div>
   </dialog>
 
@@ -498,7 +518,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.7.0';
+      var VERSION = '0.8.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -733,6 +753,23 @@
       document.getElementById('print-menu-close').addEventListener('click', function () { closeDialog(printMenu); });
       document.getElementById('print-mine').addEventListener('click', function () { printSheet('mine'); });
       document.getElementById('print-blank').addEventListener('click', function () { printSheet('blank'); });
+
+      // "Share": the site's address only, never the visitor's names. Uses the
+      // device's own share sheet where available, else copies the link.
+      var shareStatus = document.getElementById('share-status');
+      document.getElementById('share').addEventListener('click', function () {
+        var title = 'Bring your crew. Have an impact!';
+        if (navigator.share) {
+          navigator.share({ title: title, url: SITE }).catch(function () {});
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(SITE).then(function () {
+            shareStatus.hidden = false;
+            setTimeout(function () { shareStatus.hidden = true; }, 2000);
+          }).catch(function () {});
+        }
+      });
 
       // "Popular? Expand your list!" swaps with a down arrow.
       setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);

@@ -2,6 +2,12 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.8.0 "Share" (2026-10-28)
+
+- Link previews: when the address is pasted into a chat or social post, it now shows a title, description and a preview image (Open Graph and Twitter card tags). The preview image, og.png, is a static 1200x630 picture in the site's own style.
+- A small favicon (favicon.svg, a red-shadowed checkmark) and an apple-touch-icon for home screens.
+- A "Share" button in the print pop-up. Where the device offers its own share sheet, it opens that with the site's title and address; otherwise it copies the address to the clipboard and shows "Link copied!" briefly. It never sends the visitor's names.
+
 ## 0.7.0 "Flyer" (2026-10-28)
 
 - A new page, /flyer: a printable US Letter flyer for a notice board or to hand out. Headline "Bring your crew. Have an impact!", a line inviting people to make their own list of friends to take to the polls, "Election Day: Tuesday, November 3, 2026", "Ohio polls are open 6:30 a.m. to 7:30 p.m.", a QR code to the site, the address in text, and "Names stay on your phone. No sign-up." A "Print this flyer" button on screen, hidden in print, with a link back to the list.
