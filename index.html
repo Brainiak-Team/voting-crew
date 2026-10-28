@@ -5,7 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bring your crew. Have an impact!</title>
   <meta name="description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src data:; base-uri 'none'; form-action 'none'">
+  <!-- Link previews (Open Graph + Twitter card). og:image is a static file, 1200x630. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="My Voting Crew">
+  <meta property="og:title" content="Bring your crew. Have an impact!">
+  <meta property="og:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
+  <meta property="og:url" content="https://voting-crew-eight.vercel.app/">
+  <meta property="og:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bring your crew. Have an impact!">
+  <meta name="twitter:description" content="Who will you bring to the polls? A private list of the friends you'll take to vote. Your list stays on your device.">
+  <meta name="twitter:image" content="https://voting-crew-eight.vercel.app/og.png">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <style>
     /* ---- Theme. Restyle a copy of this page by editing these values. ---- */
@@ -145,7 +160,25 @@
     .rows-ctl { display: flex; gap: 14px; margin: 10px 0 0 2.6em; }
     .rows-ctl .btn { width: 44px; padding: 0; font-size: 1.6rem; line-height: 1; }
     .rows-ctl .btn:disabled { color: #9a9a9a; border-color: #9a9a9a; box-shadow: 4px 4px 0 #dddddd; cursor: default; transform: none; }
-    .info-btn { flex: none; white-space: nowrap; font-size: .9rem; padding: 4px 10px; min-height: 34px; box-shadow: 3px 3px 0 var(--accent); }
+    /* A quiet text link, not a boxed button: it shouldn't compete with
+       "Change the odds!" for attention. The "?" keeps the site's small
+       red-shadowed-badge language without the full button weight. */
+    .privacy-link {
+      flex: none; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 6px;
+      font: inherit; font-weight: 700; font-size: .85rem; color: var(--muted);
+      background: none; border: 0; padding: 6px 2px; min-height: 34px;
+      text-decoration: underline; text-underline-offset: 2px;
+      cursor: pointer;
+    }
+    .privacy-link:hover, .privacy-link:focus-visible { color: var(--ink); }
+    .privacy-link .mark {
+      flex: none; display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--line); box-shadow: 2px 2px 0 var(--accent);
+      font-size: .7rem; font-weight: 900; color: var(--ink); background: var(--bg);
+      text-decoration: none;
+    }
 
     /* ---- Privacy pop-up ---- */
     dialog {
@@ -173,12 +206,19 @@
     .dlg-body a { color: var(--ink); }
     .dlg-body .fine { color: var(--muted); font-size: .85rem; }
     [hidden] { display: none !important; }
+    .noscript-msg {
+      max-width: 640px; margin: 40px auto; padding: 16px 20px;
+      border: 2px solid var(--line); box-shadow: var(--shadow);
+      font-weight: 700; font-size: 1.05rem; line-height: 1.4;
+    }
 
     /* ---- Print menu: a small pop-up with the two ways to print ---- */
     dialog.print-menu { width: min(420px, calc(100vw - 24px)); }
     .print-menu .dlg-body { display: grid; gap: 18px; padding: 16px 16px 20px; }
     .print-menu .dlg-body .btn { width: 100%; text-align: left; }
     .print-menu .fine { margin: 6px 0 0; }
+    /* The flyer option is a link to its own page, dressed as a button. */
+    a.btn { display: block; text-decoration: none; }
 
     /* ---- Printed sheet. Built just before printing and shown only on paper.
        Black ink first, with one red shadow, so it reads in black and white. ---- */
@@ -307,9 +347,11 @@
         border: 1.5pt solid #000; box-shadow: 3pt 3pt 0 #000;
         font-size: 12pt; font-weight: 800;
       }
+      /* Polling hours: under the date box on a full page, beside it on a half. */
+      .s-hours { margin: 7pt 0 0; font-size: 11pt; font-weight: 700; }
       .s-cols {
         display: flex; justify-content: space-between;
-        margin: 14pt 0 0; padding-left: 2.2em;
+        margin: 10pt 0 0; padding-left: 2.2em;
         font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #333;
       }
       .s-list { list-style: none; margin: 0; padding: 0; }
@@ -347,6 +389,8 @@
       .half .s-head { font-size: 22pt; }
       .half .s-sub { margin-top: 4pt; font-size: 11pt; }
       .half .s-date { margin-top: 6pt; padding: 2pt 7pt; font-size: 10pt; }
+      .half .s-when { display: flex; align-items: center; gap: 12pt; }
+      .half .s-hours { margin: 6pt 0 0; font-size: 9.5pt; }
       .half .s-cols { margin-top: 6pt; font-size: 7.5pt; }
       .half .s-list li { height: 21pt; }
       .half .s-num { font-size: 11pt; }
@@ -365,6 +409,10 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <p class="noscript-msg">This list needs JavaScript to run. Even the blank sheet to print and fill in by hand is built by script, so it can't be printed without JavaScript turned on.</p>
+    <style>#pager { display: none; }</style>
+  </noscript>
   <div class="pager" id="pager">
   <div class="track" id="track">
   <div class="screen screen-main" id="screen-main">
@@ -373,7 +421,7 @@
 
     <div class="side">
       <div class="side-top">
-        <button type="button" class="btn info-btn" id="privacy-open" aria-haspopup="dialog">? Privacy</button>
+        <button type="button" class="privacy-link" id="privacy-open" aria-haspopup="dialog"><span class="mark" aria-hidden="true">?</span>Privacy</button>
         <h2 class="odds-title" id="odds-title" hidden>Change the odds!</h2>
       </div>
       <section class="odds" id="odds" aria-labelledby="odds-title" hidden>
@@ -478,6 +526,15 @@
         <button type="button" class="btn" id="print-blank" aria-describedby="print-blank-note">Print blank copies for your friends!</button>
         <p class="fine" id="print-blank-note">Two empty lists to a page. Cut along the dashed line.</p>
       </div>
+      <div>
+        <a class="btn" id="print-flyer" href="/flyer" aria-describedby="print-flyer-note">Print a flyer with a QR code</a>
+        <p class="fine" id="print-flyer-note">A poster for a notice board, or two to a page to hand out. Opens the flyer page.</p>
+      </div>
+      <div>
+        <button type="button" class="btn" id="share" aria-describedby="share-note">Share</button>
+        <p class="fine" id="share-note">Sends the site's address only &mdash; never your names.</p>
+        <p class="fine" id="share-status" role="status" aria-live="polite" hidden>Link copied!</p>
+      </div>
     </div>
   </dialog>
 
@@ -488,7 +545,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '0.6.0';
+      var VERSION = '0.11.0';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -640,6 +697,7 @@
       // the File menu) prints the visitor's list.
       var SITE = 'https://voting-crew-eight.vercel.app';
       var ELECTION_DAY = 'Tuesday, November 3, 2026';
+      var POLL_HOURS = 'Ohio polls are open 6:30 a.m. to 7:30 p.m.';
       var MINE_LINES = 16;       // lines on "my list": fills one page, at least 10
       var LONG_LINES = 44;       // lines on a list longer than that: fills two pages
       var BLANK_LINES = 10;      // lines on each blank copy
@@ -652,8 +710,9 @@
         if (text !== undefined) n.textContent = text;
         return n;
       }
-      // One copy of the list: headline, election day, numbered lines with a
-      // "Going" box each, and the site address. Names are set as text only.
+      // One copy of the list: headline, election day and polling hours,
+      // numbered lines with a "Going" box each, and the site address. Names
+      // are set as text only.
       function buildCopy(people, lines, half) {
         var copy = sheetEl('section', 'copy' + (half ? ' half' : ''));
         var head = sheetEl('div', 's-head');
@@ -662,7 +721,10 @@
         head.appendChild(sheetEl('span', '', 'Have an impact!'));
         copy.appendChild(head);
         copy.appendChild(sheetEl('p', 's-sub', 'Who will you bring to the polls?'));
-        copy.appendChild(sheetEl('p', 's-date', 'Election Day: ' + ELECTION_DAY));
+        var when = sheetEl('div', 's-when');
+        when.appendChild(sheetEl('p', 's-date', 'Election Day: ' + ELECTION_DAY));
+        when.appendChild(sheetEl('p', 's-hours', POLL_HOURS));
+        copy.appendChild(when);
         var cols = sheetEl('div', 's-cols');
         cols.appendChild(sheetEl('span', '', 'Name'));
         cols.appendChild(sheetEl('span', '', 'Going'));
@@ -718,6 +780,23 @@
       document.getElementById('print-menu-close').addEventListener('click', function () { closeDialog(printMenu); });
       document.getElementById('print-mine').addEventListener('click', function () { printSheet('mine'); });
       document.getElementById('print-blank').addEventListener('click', function () { printSheet('blank'); });
+
+      // "Share": the site's address only, never the visitor's names. Uses the
+      // device's own share sheet where available, else copies the link.
+      var shareStatus = document.getElementById('share-status');
+      document.getElementById('share').addEventListener('click', function () {
+        var title = 'Bring your crew. Have an impact!';
+        if (navigator.share) {
+          navigator.share({ title: title, url: SITE }).catch(function () {});
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(SITE).then(function () {
+            shareStatus.hidden = false;
+            setTimeout(function () { shareStatus.hidden = true; }, 2000);
+          }).catch(function () {});
+        }
+      });
 
       // "Popular? Expand your list!" swaps with a down arrow.
       setInterval(function () { expandBtn.classList.toggle('flip'); }, EXPAND_SECONDS * 1000);
@@ -780,9 +859,12 @@
       // drags scroll the list as usual, and a drag inside a name being typed
       // or while text is selected is left alone.
       var touch = null;
+      var EDGE = 24;   // px from either screen edge left to the browser's own back/forward swipe
       pager.addEventListener('touchstart', function (e) {
         touch = null;
         if (e.touches.length !== 1 || dlg.open || printMenu.open) return;
+        var x = e.touches[0].clientX;
+        if (x < EDGE || x > document.documentElement.clientWidth - EDGE) return;
         var t = e.target;
         if (t === document.activeElement && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
         var sel = window.getSelection && window.getSelection();
@@ -918,8 +1000,11 @@
           raceEl.appendChild(wrap);
         });
       }
+      var ODDS_MAX_AGE_MS = 60 * 60 * 1000;   // treat odds older than this as unavailable
       function start(data) {
         if (!data || !Array.isArray(data.races) || !data.races.length) return;
+        var age = data.updated ? Date.now() - new Date(data.updated).getTime() : Infinity;
+        if (!(age <= ODDS_MAX_AGE_MS)) return;   // stale (or unparsable): behave as if the fetch had failed
         var i = 0;
         showRace(data.races[0]);
         srcEl.textContent = 'Kalshi market odds.';

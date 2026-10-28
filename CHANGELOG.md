@@ -2,6 +2,38 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. While the major number is 0, the app is in alpha: features are still arriving and saved lists may be reset. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 0.11.0 "Release candidate" (2026-10-28)
+
+- README.md brought up to date: full feature list, the /flyer page, and hosting details (Mainiak's own Vercel account, deployed from the command line via the REST API, not Git-linked).
+- A 1.0 readiness checklist, listing what's built, what still needs Mainiak's decision (More screen content, the poll-source question, swipe-direction confirmation, real-phone testing, old-address cleanup), and a hand-test list for a real phone.
+
+## 0.10.0 "Polish" (2026-10-28)
+
+- The "? Privacy" button no longer competes with "Change the odds!" for attention. It's now a small text link with a round "?" mark, tucked beside the heading at every screen size, including when the odds tracker is hidden.
+- A wording and consistency pass across the main page, the More placeholder, both dialogs, the print sheet, the flyer and the 404 page: capitalisation, punctuation and button phrasing were checked against each other. Everything already matched; no wording changes were needed beyond the Privacy button above.
+
+## 0.9.0 "Sturdy" (2026-10-28)
+
+- On iPhone, a swipe that starts within 24px of the left or right screen edge is left alone, so Safari's own back/forward gesture works there instead of sliding to "More".
+- With JavaScript off, a plain message explains that the list (and even the blank sheet to print) needs it, instead of a broken page.
+- A 404 page in the site's own style, with a link back to the list.
+- The odds tracker now also stays hidden if the data it received is more than an hour old, the same as when the request fails outright.
+- Accessibility pass: checked keyboard focus, input and dialog labelling, and text contrast across the site. All were already in order; no changes were needed beyond what's listed above.
+
+## 0.8.0 "Share" (2026-10-28)
+
+- Link previews: when the address is pasted into a chat or social post, it now shows a title, description and a preview image (Open Graph and Twitter card tags). The preview image, og.png, is a static 1200x630 picture in the site's own style.
+- A small favicon (favicon.svg, a red-shadowed checkmark) and an apple-touch-icon for home screens.
+- A "Share" button in the print pop-up. Where the device offers its own share sheet, it opens that with the site's title and address; otherwise it copies the address to the clipboard and shows "Link copied!" briefly. It never sends the visitor's names.
+
+## 0.7.0 "Flyer" (2026-10-28)
+
+- A new page, /flyer: a printable US Letter flyer for a notice board or to hand out. Headline "Bring your crew. Have an impact!", a line inviting people to make their own list of friends to take to the polls, "Election Day: Tuesday, November 3, 2026", "Ohio polls are open 6:30 a.m. to 7:30 p.m.", a QR code to the site, the address in text, and "Names stay on your phone. No sign-up." A "Print this flyer" button on screen, hidden in print, with a link back to the list.
+- The flyer prints full page or two to a page, with a dashed "CUT HERE" line between, matching the blank copies on the list sheet.
+- The QR code is generated locally (the "qrcode" npm package) as inline SVG, error correction level H, with a four-module quiet zone, encoding exactly https://voting-crew-eight.vercel.app/.
+- The print pop-up gets a third choice, "Print a flyer with a QR code", linking to /flyer.
+- The list sheet and blank copies now also print "Ohio polls are open 6:30 a.m. to 7:30 p.m." under the Election Day line, on both the one-page and half-page layouts.
+
 ## 0.6.0 "Print" (2026-10-28)
 
 - "Print a copy!" is now "Print your list!". It opens a small pop-up with two choices: "Print my list" and "Print blank copies for your friends!". The pop-up closes with its Close button, the Escape key, or a tap outside it, and works from the keyboard alone.
