@@ -5,8 +5,8 @@ An Election Day checklist: list the friends you will take to the polls (five lin
 ## Features
 
 - One page (`index.html`), no build step, no dependencies.
-- Names are stored only in the visitor's browser (local storage). No accounts, no analytics, nothing sent anywhere. The "Privacy" pop-up explains this to visitors; update its text in `index.html` if anything about data handling changes.
-- Current design: "Bring your crew" redesign (Republican red). The plain monochrome base lives on the `base-monochrome` branch. To restyle, edit the color values at the top of the `<style>` block in `index.html`.
+- Names are stored only in the visitor's browser (local storage). No accounts, no analytics, nothing sent anywhere.
+- Current design: 1.1.0 "Bring your crew" refresh (bright red, Anton and Archivo Black fonts self-hosted in `fonts/`). The plain monochrome base lives on the `base-monochrome` branch. To restyle, edit the color values at the top of the `<style>` block in `index.html`.
 - A "More" screen sits to the right of the main page (swipe, or tap "More!"): a side-by-side issue comparison for the Governor (Ramaswamy R vs. Acton D) and U.S. Senate (Husted R vs. Brown D) races, drawn from the Republican candidates' campaign sites and each candidate's own site, with source links.
 - Optional Ohio race polling tracker. Turn it off by setting `SHOW_ODDS = false` in the settings block at the top of the `<script>` in `index.html`. The tracker hides itself, rather than show stale numbers, if the request fails.
 - Polling comes from `api/odds.mjs`, a Vercel server function that reads VoteHub's public polls API (no key), filtered to Fox News's Ohio polls (run by Beacon Research/Shaw & Co. Research), and is cached for an hour. Visitors' browsers never contact VoteHub. Add or remove races in its `RACES` list.

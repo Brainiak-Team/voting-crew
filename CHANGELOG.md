@@ -2,6 +2,23 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 1.1.0 (2026-10-29)
+
+A new look, drawn to match Mainiak's new design. The list, printing, the poll, the More screen and saved names all work as before.
+
+- The headline "Bring your crew. Have an impact!" is set big and black in an Impact-style font, on a gentle curve that rises to the right. On narrow phones it takes two lines. Screen readers still read it as one heading.
+- All other text uses an Arial Black-style font. Both fonts (Anton and Archivo Black, free under the SIL Open Font License) are served from this site, so every device shows the same letters and nothing is fetched from anyone else.
+- The red is brighter: #EE1414, taken from the design. It is used for the shadows, the Republican poll bar and the "More!" hint.
+- The black frame around the page is gone.
+- The list has thin writing lines, and each "Going" box is a rounded square with a black outline. On wide screens the rows are spaced like the design, a little tighter than before on short landscape phones; upright phones and tall screens keep 44-pixel rows.
+- The curved arrow "Who will you bring to the polls?" is redrawn from the design: white with a thick black outline and a red shadow, with the words following the curve. It sits at the bottom right on wide screens, and under the list on phones held upright.
+- "Print your list!" is a white button with a black outline and a red shadow.
+- "Popular? Expand your list!" still swaps with a down arrow every 5 seconds. The arrow is redrawn as an outlined arrow with a red shadow. On wide screens it sits beside the print button; on narrower screens it gets its own line just above or below the button, so the words always stay on one line.
+- The Privacy button and its pop-up are removed. Names are still stored only on your device, as before.
+- The poll box, the "More!" hint and the More screen use the new fonts and red. On the More screen, headings, issue names and labels use the bold font, while the longer answers, note and sources use a plain, easier-to-read font. Content is unchanged.
+- On wide screens, the first answer in each row of the More table now lines up with the answer beside it.
+- Printed lists keep their layout and plain font; only their red shadow takes the new red. The flyer is unchanged.
+
 ## 1.0.1 (2026-10-29)
 
 Bug fixes from a full test pass, and from Mainiak's iPhone print previews.
