@@ -70,9 +70,12 @@
     }
 
     /* ---- The flyer itself ---- */
+    /* 9.3in tall, not the full 10in: Safari on iPhone prints its own header
+       and footer inside the margins, and anything taller spills onto a
+       second page. */
     .flyer {
       position: relative;
-      height: 100%;
+      height: 9.3in; overflow: hidden;
       margin-right: 5pt;
       border: 2pt solid #000;
       box-shadow: 5pt 5pt 0 var(--accent);
@@ -90,12 +93,13 @@
       font-size: 17pt; font-weight: 800;
     }
     .f-hours { margin: 12pt 0 0; font-size: 15pt; font-weight: 700; }
-    /* QR code and how to use it, centered in the space that is left. */
-    .f-scan { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; padding-top: 8pt; }
+    /* QR code and how to use it, centered in the space that is left. If it
+       is ever too tall, it runs off the bottom rather than over the words. */
+    .f-scan { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: safe center; min-height: 0; padding-top: 8pt; }
     .f-call { display: flex; align-items: center; gap: 10pt; margin: 0 0 10pt; font-size: 17pt; font-weight: 800; font-style: italic; }
     .f-call svg { width: 28pt; height: auto; overflow: visible; flex: none; }
     .f-qr {
-      width: 4in; height: 4in;
+      width: 3.6in; height: 3.6in;
       border: 2pt solid #000; box-shadow: 5pt 5pt 0 var(--accent);
       -webkit-print-color-adjust: exact; print-color-adjust: exact;
       background: #fff;
@@ -112,7 +116,7 @@
        copies of the list). */
     .paper.halves { display: flex; flex-direction: column; }
     .flyer.half {
-      height: 4.66in; flex: none;
+      height: 4.4in; flex: none;
       padding: 16pt 20pt 14pt;
       display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18pt;
       grid-template-areas: "words scan";
@@ -132,7 +136,7 @@
     .f-words { display: contents; }
     .half .f-words { display: flex; }
     .cut {
-      position: relative; height: 0.6in; margin: 0 -0.5in; flex: none;
+      position: relative; height: 0.5in; margin: 0 -0.5in; flex: none;
     }
     .cut::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.2pt dashed #000; }
     .cut span {
@@ -147,8 +151,7 @@
       body { background: #fff; }
       .bar { display: none !important; }
       .stage { padding: 0; }
-      /* A little short of the full 10in, so the bottom shadow is not cut off. */
-      .paper { zoom: 1; width: auto; height: calc(10in - 6pt); padding: 0; box-shadow: none; }
+      .paper { zoom: 1; width: auto; height: auto; padding: 0; box-shadow: none; }
     }
   </style>
 </head>
@@ -229,7 +232,51 @@
         fullBtn.setAttribute('aria-pressed', String(!half));
         halfBtn.setAttribute('aria-pressed', String(half));
         history.replaceState(null, '', half ? '?half' : location.pathname);
+        fitAll();
       }
+      // Fit the words to the paper whatever font the device has: each line
+      // of the headline shrinks until it is one line (the iPhone's font is
+      // wider than most, and wrapped it to four), then the QR code shrinks
+      // if the flyer is still too full. Measured in lines and overflow, so
+      // the screen zoom does not matter.
+      function lineCount(el) {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var tops = {};
+        Array.prototype.forEach.call(range.getClientRects(), function (r) {
+          if (r.width > 0) tops[Math.round(r.top)] = true;
+        });
+        return Object.keys(tops).length;
+      }
+      function fitOne(f) {
+        var head = f.querySelector('.f-head');
+        var qr = f.querySelector('.f-qr');
+        head.style.fontSize = '';
+        qr.style.width = qr.style.height = '';
+        var size = parseFloat(getComputedStyle(head).fontSize);   // px
+        var min = size * 0.6;
+        var spans = head.querySelectorAll('span');
+        function wraps() {
+          return Array.prototype.some.call(spans, function (s) { return lineCount(s) > 1; });
+        }
+        while (wraps() && size > min) {
+          size -= 1;
+          head.style.fontSize = size + 'px';
+        }
+        var side = parseFloat(getComputedStyle(qr).width);         // px
+        var least = side * 0.7;
+        while (f.scrollHeight > f.clientHeight + 1 && side > least) {
+          side -= 4;
+          qr.style.width = qr.style.height = side + 'px';
+        }
+      }
+      function fitAll() {
+        Array.prototype.forEach.call(paper.querySelectorAll('.flyer'), fitOne);
+      }
+      window.addEventListener('resize', fitAll);
+      window.addEventListener('beforeprint', fitAll);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+
       fullBtn.addEventListener('click', function () { setSize(false); });
       halfBtn.addEventListener('click', function () { setSize(true); });
       document.getElementById('print').addEventListener('click', function () { window.print(); });

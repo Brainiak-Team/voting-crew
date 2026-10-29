@@ -230,7 +230,9 @@
     /* Positioned, so the clip also holds in the absolutely placed captions. */
     .pager { position: relative; overflow-x: hidden; overflow-x: clip; }
     .track { display: flex; align-items: flex-start; transition: transform .35s ease; }
-    .screen { flex: 0 0 100%; min-width: 0; }
+    /* Positioned, so the hidden table captions stay inside their own screen
+       and the cut-down screen out of view clips them too. */
+    .screen { position: relative; flex: 0 0 100%; min-width: 0; }
     /* The screen out of view is hidden and cut to one screen height, so the
        page does not keep the other screen's length. */
     .screen.away { visibility: hidden; max-height: 100vh; overflow: hidden; }
@@ -262,12 +264,12 @@
     }
     /* Room for the hint, so it never covers a name line or a button. Wide
        screens already have space beside the page. */
-    @media (max-width: 1019px) {
+    @media (max-width: 1039px) {
       .app { margin-right: calc(var(--hint-w) + env(safe-area-inset-right, 0px)); }
     }
     /* Wide screens: the hint sits just right of the page box, not at the far
        edge of the window where nobody looks. */
-    @media (min-width: 1020px) {
+    @media (min-width: 1040px) {
       .more-hint { right: calc(50% - 480px - var(--hint-w) - 10px); }
     }
 
@@ -405,20 +407,25 @@
       }
       .s-list { list-style: none; margin: 0; padding: 0; }
       .s-list li::before { content: none; }
+      /* Each line sits at the bottom of its row, with the number on the
+         same baseline as the name (one wrapping flex line, so the row can
+         align to the bottom while the items align to the baseline). */
       .s-list li {
-        display: flex; align-items: flex-end; gap: 8pt;
-        height: 30pt;
+        display: flex; flex-wrap: wrap; align-content: flex-end; align-items: baseline; gap: 8pt;
+        height: 26pt;
         break-inside: avoid; page-break-inside: avoid;
       }
-      .s-num { width: 1.6em; flex: none; text-align: right; font-size: 13pt; font-weight: 800; padding-bottom: 3pt; }
+      .s-num { width: 1.6em; flex: none; text-align: right; font-size: 13pt; font-weight: 800; }
       .s-name {
         flex: 1; min-width: 0;
         border-bottom: 1.5pt solid #000; padding: 0 2pt 3pt;
         font-size: 14pt; font-weight: 600;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       }
+      /* A blank line still has a baseline for its number to sit on. */
+      .s-name:empty::before { content: "\200B"; }
       /* "Going" box, drawn with borders (borders always print). */
-      .s-box { flex: none; position: relative; width: 15pt; height: 15pt; margin: 0 6pt 3pt 4pt; border: 1.5pt solid #000; }
+      .s-box { flex: none; align-self: flex-end; position: relative; width: 15pt; height: 15pt; margin: 0 6pt 3pt 4pt; border: 1.5pt solid #000; }
       .s-box.on::after {
         content: ""; position: absolute; left: 4pt; top: 0;
         width: 4pt; height: 9pt;
@@ -429,23 +436,25 @@
          on each page without the shadow (which some browsers smear across
          the page break). */
       .copy.long { box-shadow: none; }
-      .long .s-list li { height: 26pt; }
+      .long .s-list li { height: 24pt; }
       .s-url { margin: 14pt 0 0; font-size: 8.5pt; color: #333; text-align: center; }
       .s-url b { color: #000; }
 
-      /* Blank copies: two half-page copies to a sheet, with a cut line. */
-      .copy.half { height: 4.66in; padding: 14pt 20pt 10pt; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+      /* Blank copies: two half-page copies to a sheet, with a cut line.
+         2 x 4.4in + 0.5in leaves room for the header and footer Safari on
+         iPhone prints inside the margins. */
+      .copy.half { height: 4.4in; padding: 12pt 20pt 8pt; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
       .half .s-head { font-size: 22pt; }
       .half .s-sub { margin-top: 4pt; font-size: 11pt; }
       .half .s-date { margin-top: 6pt; padding: 2pt 7pt; font-size: 10pt; }
       .half .s-when { display: flex; align-items: center; gap: 12pt; }
       .half .s-hours { margin: 6pt 0 0; font-size: 9.5pt; }
-      .half .s-cols { margin-top: 6pt; font-size: 7.5pt; }
-      .half .s-list li { height: 21pt; }
+      .half .s-cols { margin-top: 4pt; font-size: 7.5pt; }
+      .half .s-list li { height: 19pt; }
       .half .s-num { font-size: 11pt; }
-      .half .s-url { margin-top: 6pt; font-size: 7.5pt; }
+      .half .s-url { margin-top: 4pt; font-size: 7.5pt; }
       .cut {
-        position: relative; height: 0.6in; margin: 0 -0.5in;
+        position: relative; height: 0.5in; margin: 0 -0.5in;
         break-inside: avoid; page-break-inside: avoid;
       }
       .cut::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.2pt dashed #000; }
@@ -474,7 +483,7 @@
         <h2 class="odds-title" id="odds-title" hidden>Change the odds!</h2>
       </div>
       <section class="odds" id="odds" aria-labelledby="odds-title" hidden>
-        <div class="race" id="race" aria-live="polite"></div>
+        <div class="race" id="race"></div>
         <p class="odds-src" id="odds-src"></p>
       </section>
 
@@ -511,7 +520,7 @@
         <h2 id="more-title" tabindex="-1">More</h2>
       </div>
       <p>Where the candidates stand, issue by issue.</p>
-      <p class="cmp-note">Issues below are taken from each race's Republican candidate's own campaign site. Each candidate's position &mdash; including the Democratic candidate's &mdash; is drawn from that candidate's own campaign site; a dash means the site did not address it.</p>
+      <p class="cmp-note">Issues below are taken from each race's Republican candidate's own campaign site. Each candidate's position &mdash; including the Democratic candidate's &mdash; is drawn from that candidate's own campaign site. Where a site does not address an issue, the cell says so.</p>
 
       <section class="cmp-race" aria-labelledby="cmp-gov-title">
         <h3 id="cmp-gov-title">Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)</h3>
@@ -669,7 +678,7 @@
     (function () {
       'use strict';
       // ---- Page settings ----
-      var VERSION = '1.0.0';
+      var VERSION = '1.0.1';
       var SHOW_ODDS = true;      // false removes the odds tracker
       var START = 5;             // names shown at first
       var EXPANDED = 10;         // names after "Expand your list"
@@ -890,11 +899,14 @@
         if (long) copy.classList.add('long');
         sheet.appendChild(copy);
       }
+      // Print first, straight from the tap, then close the pop-up: Safari
+      // can treat a print that follows other page changes as "automatic" and
+      // block it. The pop-up never prints either way (only the sheet does).
       function printSheet(kind) {
-        closeDialog(printMenu);
         buildSheet(kind);
         sheetReady = true;
         window.print();
+        closeDialog(printMenu);
       }
       // The browser's own Print command, from either screen: the visitor's list.
       window.addEventListener('beforeprint', function () {
@@ -909,17 +921,25 @@
       // "Share": the site's address only, never the visitor's names. Uses the
       // device's own share sheet where available, else copies the link.
       var shareStatus = document.getElementById('share-status');
+      var shareTimer;
       document.getElementById('share').addEventListener('click', function () {
         var title = 'Bring your crew. Have an impact!';
         if (navigator.share) {
           navigator.share({ title: title, url: SITE }).catch(function () {});
           return;
         }
+        function say(text, ms) {
+          shareStatus.textContent = text;
+          shareStatus.hidden = false;
+          clearTimeout(shareTimer);
+          shareTimer = setTimeout(function () { shareStatus.hidden = true; }, ms);
+        }
+        var failed = 'Couldn\u2019t copy the link. The address is ' + SITE_PRINT;
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(SITE).then(function () {
-            shareStatus.hidden = false;
-            setTimeout(function () { shareStatus.hidden = true; }, 2000);
-          }).catch(function () {});
+          navigator.clipboard.writeText(SITE).then(function () { say('Link copied!', 2000); })
+            .catch(function () { say(failed, 8000); });
+        } else {
+          say(failed, 8000);
         }
       });
 
@@ -973,7 +993,7 @@
       // Wide screens: "More!" sits level with the middle of the page box (the
       // visible part of it), not the middle of the window.
       var box = document.querySelector('#screen-main .app');
-      var wide = window.matchMedia('(min-width: 1020px)');
+      var wide = window.matchMedia('(min-width: 1040px)');
       function placeHint() {
         if (!wide.matches || !box) { hint.style.top = ''; return; }
         var r = box.getBoundingClientRect();
@@ -1135,13 +1155,25 @@
       // Staleness here means the fetch itself failed (or returned nothing
       // usable) — polls are weeks old by nature, so their age is not a sign
       // of a problem the way it would be for a live market.
+      // Until the numbers arrive, the box is drawn with blank bars, so the
+      // page does not jump when they land. A failed fetch removes it again.
+      var PLACEHOLDER = {
+        label: 'U.S. Senate', subtitle: 'Ohio special election', fieldwork: 'loading',
+        candidates: [{ name: 'Jon Husted', partyKey: 'R' }, { name: 'Sherrod Brown', partyKey: 'D' }],
+      };
+      function setOddsShown(on) {
+        oddsEl.hidden = !on;
+        document.getElementById('odds-title').hidden = !on;
+      }
+      showRace(PLACEHOLDER);
+      raceEl.lastChild.textContent = 'Loading the latest Fox News poll\u2026';
+      srcEl.textContent = 'Fox News poll (Beacon Research/Shaw & Co.), via VoteHub (CC BY 4.0)';
+      setOddsShown(true);
       function start(data) {
-        if (!data || !Array.isArray(data.races) || !data.races.length) return;
+        if (!data || !Array.isArray(data.races) || !data.races.length) { setOddsShown(false); return; }
         var i = 0;
         showRace(data.races[0]);
         srcEl.textContent = data.credit || 'Fox News poll, via VoteHub.';
-        oddsEl.hidden = false;
-        document.getElementById('odds-title').hidden = false;
         if (data.races.length < 2) return;
         setInterval(function () {
           raceEl.classList.add('fade');
@@ -1156,7 +1188,7 @@
       fetch('/api/odds')
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(start)
-        .catch(function () {});
+        .catch(function () { setOddsShown(false); });
     })();
   </script>
 </body>

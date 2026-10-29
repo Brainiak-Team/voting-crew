@@ -6,9 +6,11 @@
 // Vercel's cache keeps each answer for an hour, so VoteHub is asked at most
 // about once an hour no matter how many people visit.
 
-const BASE = 'https://api.votehub.com/polls';
 const CACHE_SECONDS = 3600;
 const SUBJECT = '2026 Ohio';
+// Ask VoteHub for Ohio's polls only. The unfiltered list is the whole
+// national archive (about 3 MB, 8 s); Ohio alone is about 30 KB, 0.2 s.
+const BASE = `https://api.votehub.com/polls?subject=${encodeURIComponent(SUBJECT)}`;
 const SPONSOR = 'Fox News';
 
 // Add a race here and it appears as a new tab. Nothing else needs to change.
