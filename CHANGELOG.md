@@ -2,6 +2,21 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
 
+## 1.0.1 (2026-10-29)
+
+Bug fixes from a full test pass, and from Mainiak's iPhone print previews.
+
+- The poll loads much faster. `api/odds.mjs` now asks VoteHub for Ohio's polls only (about 30 KB) instead of the whole archive (about 3 MB, which took around 8 seconds whenever the cache was empty).
+- The poll box appears straight away, showing the race with blank bars and "Loading the latest Fox News poll…", so the list no longer jumps down the page when the numbers arrive. If the poll can't be loaded, the box hides as before.
+- Phones no longer scroll far past the end of the list into blank space. The More screen's hidden table captions were stretching the page.
+- The "More!" hint is no longer cut off at the window's edge on 1024px-wide screens (iPad landscape, small laptops). The wide layout now starts at 1040px.
+- The More screen's note now matches its tables: where a campaign site does not address an issue, the cell says so.
+- Screen readers no longer read the poll aloud each time it rotates.
+- Share says so if copying the link fails, and shows the address instead.
+- Printing starts before the Print pop-up closes, so Safari is less likely to treat it as an automatic print and block it.
+- Printed lists: each number sits on the same line as its name.
+- Printing on iPhone: every sheet is now short enough for the header and footer Safari adds, so nothing spills onto a second page. The flyer's headline shrinks to fit when a device's font is wider (on iPhone it had wrapped to four lines and pushed "Scan to make your own list!" over the polling hours), the QR code shrinks if the page is still too full, and the QR area can never ride up over the words. The full-page QR code is now 3.6 inches, and list lines are slightly closer together.
+
 ## 1.0.0 (2026-10-28)
 
 - First stable release. The app is complete and usable: the private list, printing, the flyer, sharing, the issue comparison and the poll tracker, at https://bringyourcrew.com. Same features as 0.13.0; only the version number changes.
