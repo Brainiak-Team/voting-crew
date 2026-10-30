@@ -2,6 +2,19 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit. From 1.2.0 on, Mainiak adds the tag after merging.
 
+## 1.3.0 (2026-10-29)
+
+A new look for the More screen, drawn to match Mainiak's new design. The wording, the sources and everything else on the site are unchanged.
+
+- The issue table is replaced by cards: each race gets its own section, and inside it one card per issue, in the same order as before.
+- Each card fades from the site's red (#EE1414) on the left to grey on the right, with white text. The Republican answer stays on the left and the Democratic answer on the right, with a thin white line between them. The fade is only inside the cards; the page stays white.
+- Each race starts with a thick black line, the office in small capitals and the matchup in the big headline font, for example "Vivek Ramaswamy vs. Amy Acton". Races are spaced well apart; issues within a race only have a small gap.
+- On phones, the issue name sits centered above the two answers, with the candidates' surnames labeled above the cards. From 768 pixels wide, the issue name gets its own column on the left, and a row of labels (Issue, then both full names) lines up with the columns of every card.
+- Where a candidate's site does not cover an issue, "Not addressed on campaign site." is shown in italics.
+- Screen readers hear each race heading as before (for example "Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)"), each issue as a heading under it, and each answer with the candidate's name and party in front.
+- The "Sources" links each have a 44-pixel-tall tap area.
+- The main page, the poll, printed lists and the flyer are unchanged.
+
 ## 1.2.0 (2026-10-29)
 
 Housekeeping. Nothing on the site looks or works differently.
