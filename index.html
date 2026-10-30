@@ -253,10 +253,10 @@
 
     /* ---- Screens: the page (screen 1) and "More" (screen 2), side by side.
        One horizontal swipe, or the "More!" hint, slides between them. ---- */
-    /* Positioned, so the clip also holds in the absolutely placed captions. */
+    /* Positioned, so the clip also holds in the absolutely placed screen-reader labels. */
     .pager { position: relative; overflow-x: hidden; overflow-x: clip; }
     .track { display: flex; align-items: flex-start; transition: transform .35s ease; }
-    /* Positioned, so the hidden table captions stay inside their own screen
+    /* Positioned, so the hidden screen-reader labels stay inside their own screen
        and the cut-down screen out of view clips them too. */
     .screen { position: relative; flex: 0 0 100%; min-width: 0; }
     /* The screen out of view is hidden and cut to one screen height, so the
@@ -299,61 +299,98 @@
       .more-hint { right: calc(50% - 480px - var(--hint-w) - 10px); }
     }
 
-    /* ---- Screen 2: "More" ---- */
+    /* ---- Screen 2: "More" ----
+       Phones (up to 767px): issue cards with the two answers side by side
+       under the issue name. 768px and up: one grid shared by the column
+       labels and the cards (issue | Republican | line | Democrat).
+       The fade goes only inside the cards, Republican (red) always on the left. */
+    :root {
+      --cmp-from: #ee1414;    /* card fade start (#d81010 gives white text more contrast) */
+      --cmp-to: #5c5c5c;      /* card fade end */
+      --cmp-rule: rgba(255, 255, 255, .45);   /* line between the two answers */
+    }
     .more {
-      max-width: 960px; min-height: 100vh; margin: 0 auto;
-      padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 16px max(14px, env(safe-area-inset-left));
+      --side: max(14px, env(safe-area-inset-left), env(safe-area-inset-right));
+      max-width: calc(1040px + 2 * var(--side)); min-height: 100vh; margin: 0 auto;
+      padding: max(16px, env(safe-area-inset-top)) var(--side) 40px;
     }
     .more-head { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
-    .more h2 { margin: 0; font-size: clamp(1.6rem, 7.6vw, 2.6rem); font-weight: 400; line-height: 1.05; }
+    .more-head .btn { font-size: 16px; line-height: normal; padding: 8px 14px; white-space: nowrap; flex: none; }
+    .more h2 { margin: 0; font-size: 34px; font-weight: 400; line-height: 1.05; }
     .more h2:focus { outline: none; }
-    .more p { margin: 0 0 8px; font-size: 1.05rem; }
     .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-    .more .cmp-note { margin: 0 0 22px; font-size: .8rem; line-height: 1.5; color: var(--muted); max-width: 52em; }
-    .cmp-race { margin: 0 0 30px; max-width: 900px; }
-    .cmp-race h3 { margin: 0 0 12px; font-size: 1.1rem; font-weight: 400; line-height: 1.25; }
-    .cmp-sources { margin: 12px 0 0; font-size: .75rem; color: var(--muted); }
-    .cmp-sources a { color: var(--ink); }
-    /* Issue comparison table: stacked "Issue / R / D" blocks by default, so
-       long sentences stay readable on a phone; a real table once there's
-       room for three columns side by side. Neutral: no party coloring. */
-    table.cmp { width: 100%; border-collapse: collapse; margin: 0; }
-    table.cmp, table.cmp thead, table.cmp tbody, table.cmp tr, table.cmp th, table.cmp td { display: block; }
-    table.cmp thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
-    table.cmp tr { border: 1.5px solid var(--line); box-shadow: var(--shadow); margin: 0 0 16px; padding: 12px 14px; }
-    table.cmp th[scope="row"] {
-      font-size: .95rem; font-weight: 400; text-align: left;
-      padding: 0 0 8px; margin: 0 0 8px; border-bottom: 1px solid var(--line);
-    }
-    table.cmp td { padding: 8px 0 0; font-size: .8rem; line-height: 1.5; }
-    table.cmp td:first-of-type { padding-top: 0; }
-    table.cmp td::before {
-      content: attr(data-label) ":"; display: block; margin: 0 0 2px;
-      font-size: .66rem; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .05em;
-    }
-    table.cmp td.na { color: var(--muted); }
+    .more-intro { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     /* Long reading text in a regular font; Archivo Black stays on headings,
        issue names and labels. */
-    .more .cmp-note, .cmp-sources, table.cmp td { font-family: var(--print-font); font-weight: 400; font-synthesis: none; }
-    table.cmp td { font-size: .95rem; }
-    table.cmp td::before { font-family: var(--font); }
-    @media (min-width: 720px) {
-      table.cmp { table-layout: fixed; display: table; border: 1.5px solid var(--line); box-shadow: 4px 4px 0 var(--accent); }
-      table.cmp tbody { display: table-row-group; }
-      table.cmp thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
-      table.cmp tr { display: table-row; border: 0; box-shadow: none; margin: 0; padding: 0; }
-      table.cmp th, table.cmp td {
-        display: table-cell; border: 1px solid var(--line);
-        padding: 10px 12px; vertical-align: top; text-align: left;
+    .cmp-note, .cmp-sources, .cmp-card p { font-family: var(--print-font); font-weight: 400; font-synthesis: none; }
+    .cmp-note { margin: 0 0 28px; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+    .cmp-races { display: flex; flex-direction: column; gap: 44px; }
+    /* Races: a heavy rule and a big gap. Issues: only a small gap. */
+    .cmp-race { display: flex; flex-direction: column; gap: 12px; border-top: 4px solid var(--ink); padding-top: 14px; }
+    /* Each race heading has an aria-label in normal case, since screen readers
+       can spell out uppercase text letter by letter. */
+    .cmp-race h3 {
+      margin: 0 0 6px; font-family: var(--head-font); font-weight: 400;
+      font-size: 30px; line-height: 1.1; text-transform: uppercase;
+    }
+    .cmp-office {
+      display: block; margin-bottom: 2px;
+      font-family: var(--font); font-size: 11px; line-height: normal;
+      letter-spacing: .08em; color: var(--muted);
+    }
+    .cmp-vs { color: var(--muted); }
+    .cmp-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; line-height: normal;
+      font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .cmp-cols > :last-child { text-align: right; }
+    .cmp-col-issue, .cmp-col-gap, .cmp-first { display: none; }
+    .cmp-card {
+      display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 10px 12px;
+      border-radius: 16px; padding: 14px 14px 16px;
+      background: linear-gradient(90deg, var(--cmp-from) 0%, var(--cmp-to) 100%);
+      color: #ffffff;
+    }
+    .cmp-card h4 {
+      grid-column: 1 / -1; margin: 0;
+      font-size: 16px; font-weight: 400; line-height: 1.25; text-align: center; text-wrap: balance;
+    }
+    .cmp-card p { margin: 0; font-size: 14px; line-height: 1.45; overflow-wrap: break-word; }
+    .cmp-card .na { font-style: italic; font-synthesis: style; }
+    .cmp-rule { background: var(--cmp-rule); }
+    .cmp-sources {
+      display: flex; flex-wrap: wrap; column-gap: 6px;
+      margin: 2px 0 0; font-size: 13px; line-height: normal; color: var(--muted);
+    }
+    /* Each source link gets a 44px-tall tap area without moving the line. */
+    .cmp-sources a { position: relative; color: var(--ink); }
+    .cmp-sources a::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+    .cmp-sources a:hover { color: var(--accent); }
+    @media (min-width: 768px) {
+      .more {
+        --side: max(clamp(28px, 6.25vw - 16px, 64px), env(safe-area-inset-left), env(safe-area-inset-right));
+        padding: max(40px, env(safe-area-inset-top)) var(--side) 72px;
       }
-      /* First column (the issue name) stays narrow; the two candidate
-         columns split the rest evenly. */
-      table.cmp th:first-child, table.cmp td:first-child { width: 20%; }
-      table.cmp thead th { font-weight: 400; font-size: .8rem; }
-      table.cmp th[scope="row"] { border-bottom: 1px solid var(--line); padding: 10px 12px; margin: 0; font-size: .85rem; }
-      table.cmp td, table.cmp td:first-of-type { font-size: .78rem; padding-top: 10px; }
-      table.cmp td::before { content: none; display: none; }
+      .more-head { gap: 20px; margin-bottom: 18px; }
+      .more-head .btn { padding: 8px 16px; }
+      .more h2 { font-size: 48px; }
+      .more-intro { margin-bottom: 10px; font-size: 20px; }
+      .cmp-note { max-width: 720px; margin-bottom: 48px; font-size: 15px; line-height: 1.55; }
+      .cmp-races { gap: 72px; }
+      .cmp-race { gap: 14px; border-top-width: 5px; padding-top: 20px; }
+      .cmp-race h3 { margin-bottom: 8px; font-size: 44px; }
+      .cmp-office { margin-bottom: 4px; font-size: 13px; }
+      .cmp-cols, .cmp-card { grid-template-columns: 220px minmax(0, 1fr) 1px minmax(0, 1fr); column-gap: 32px; }
+      .cmp-cols { padding: 0 28px; font-size: 13px; }
+      .cmp-cols > :last-child { text-align: left; }
+      .cmp-col-issue { display: block; color: var(--muted); }
+      .cmp-col-gap { display: block; }
+      .cmp-first { display: inline; }
+      .cmp-card { align-items: start; border-radius: 18px; padding: 22px 28px; }
+      .cmp-card h4 { grid-column: 1; font-size: 18px; text-align: left; }
+      .cmp-card p { font-size: 16px; line-height: 1.5; text-wrap: pretty; }
+      .cmp-rule { align-self: stretch; }
+      .cmp-sources { margin-top: 4px; font-size: 14px; }
     }
 
     /* Reduced motion: screens switch without sliding, and the hint stays
@@ -575,84 +612,81 @@
         <button type="button" class="btn" id="more-back" aria-label="Back to your list">&lsaquo; Back</button>
         <h2 id="more-title" tabindex="-1">More</h2>
       </div>
-      <p>Where the candidates stand, issue by issue.</p>
+      <p class="more-intro">Where the candidates stand, issue by issue.</p>
       <p class="cmp-note">Issues below are taken from each race's Republican candidate's own campaign site. Each candidate's position &mdash; including the Democratic candidate's &mdash; is drawn from that candidate's own campaign site. Where a site does not address an issue, the cell says so.</p>
 
-      <section class="cmp-race" aria-labelledby="cmp-gov-title">
-        <h3 id="cmp-gov-title">Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)</h3>
-        <table class="cmp">
-          <caption class="vh">Issue comparison, Governor race</caption>
-          <thead>
-            <tr><th scope="col">Issue</th><th scope="col">Vivek Ramaswamy (R)</th><th scope="col">Amy Acton (D)</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" data-label="Issue">Taxes</th>
-              <td data-label="Vivek Ramaswamy (R)">Wants to cut property taxes right away and phase out Ohio's income tax, starting with eliminating the capital-gains tax.</td>
-              <td data-label="Amy Acton (D)">Says her top priority is a tax cut for working families: an earned-income credit plus new child tax credits.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Energy costs &amp; business climate</th>
-              <td data-label="Vivek Ramaswamy (R)">Would expand natural gas and new energy technology, streamline permitting, and cut regulations to lower electric bills and draw industry.</td>
-              <td data-label="Amy Acton (D)">Would lower bills by adding low-cost, clean power and naming utility regulators who favor ratepayers over utility companies.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Education</th>
-              <td data-label="Vivek Ramaswamy (R)">Would raise academic standards, expand parental choice in schooling, pay top teachers more, and grow career-technical education.</td>
-              <td data-label="Amy Acton (D)">Would restore public school funding to the state's constitutional level and keep public funding for public schools only.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Crime &amp; public safety</th>
-              <td data-label="Vivek Ramaswamy (R)">Would toughen bail and sentencing for repeat violent offenders and back police to act quickly against crime.</td>
-              <td data-label="Amy Acton (D)">Would fully fund police and first responders and invest in mental-health and addiction treatment alongside law enforcement.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Political tone (&ldquo;One Ohio&rdquo;)</th>
-              <td data-label="Vivek Ramaswamy (R)">Frames his campaign as restoring respectful political discourse and uniting Ohioans around shared, common-sense values over partisan division.</td>
-              <td data-label="Amy Acton (D)" class="na">Not addressed on campaign site.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Data centers</th>
-              <td data-label="Vivek Ramaswamy (R)">Pledges free electricity for residents near data centers, mandatory full tax payment plus homeowner rebates, and strict environmental rules.</td>
-              <td data-label="Amy Acton (D)">Would require data centers to cover 100% of their own utility costs, use union labor, and meet strict environmental/transparency rules.</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="cmp-sources">Sources: <a href="https://vivekforohio.com/the-plan" target="_blank" rel="noopener noreferrer">Ramaswamy (R)</a> &middot; <a href="https://actonforgovernor.com/issues" target="_blank" rel="noopener noreferrer">Acton (D)</a></p>
-      </section>
-
-      <section class="cmp-race" aria-labelledby="cmp-sen-title">
-        <h3 id="cmp-sen-title">U.S. Senate: Jon Husted (R) vs. Sherrod Brown (D)</h3>
-        <table class="cmp">
-          <caption class="vh">Issue comparison, U.S. Senate race</caption>
-          <thead>
-            <tr><th scope="col">Issue</th><th scope="col">Jon Husted (R)</th><th scope="col">Sherrod Brown (D)</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" data-label="Issue">Jobs &amp; economic development</th>
-              <td data-label="Jon Husted (R)">Points to helping land Ohio's largest-ever economic development deal (Intel's chip plant) and creating job-training programs like TechCred.</td>
-              <td data-label="Sherrod Brown (D)">Site criticizes past corporate tax breaks and trade deals for having shipped Ohio jobs overseas, without naming a current jobs plan.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Taxes &amp; government efficiency</th>
-              <td data-label="Jon Husted (R)">Says he founded InnovateOhio to cut government waste, and backed what was at the time the state's largest income-tax cut.</td>
-              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Life / values</th>
-              <td data-label="Jon Husted (R)">Describes himself as a lifelong "champion for life," a stance he connects to his own adoption out of foster care.</td>
-              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
-            </tr>
-            <tr>
-              <th scope="row" data-label="Issue">Law enforcement &amp; public safety</th>
-              <td data-label="Jon Husted (R)">Says he backs police and helped secure millions of dollars in funding for law-enforcement agencies.</td>
-              <td data-label="Sherrod Brown (D)" class="na">Not addressed on campaign site.</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="cmp-sources">Sources: <a href="https://www.jonhustedforsenate.com/bio/" target="_blank" rel="noopener noreferrer">Husted (R)</a> &middot; <a href="https://www.sherrodbrown.com/our-fight/" target="_blank" rel="noopener noreferrer">Brown (D)</a></p>
-      </section>
+      <div class="cmp-races">
+        <section class="cmp-race" aria-labelledby="cmp-gov-title">
+          <h3 id="cmp-gov-title" aria-label="Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)"><span class="cmp-office">Governor<span class="vh">:</span></span> Vivek Ramaswamy<span class="vh"> (R)</span> <span class="cmp-vs">vs.</span> Amy Acton<span class="vh"> (D)</span></h3>
+          <div class="cmp-cols" aria-hidden="true"><span class="cmp-col-issue">Issue</span><span><span class="cmp-first">Vivek </span>Ramaswamy (R)</span><span class="cmp-col-gap"></span><span><span class="cmp-first">Amy </span>Acton (D)</span></div>
+          <div class="cmp-card">
+            <h4>Taxes</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Wants to cut property taxes right away and phase out Ohio's income tax, starting with eliminating the capital-gains tax.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Amy Acton (D): </span>Says her top priority is a tax cut for working families: an earned-income credit plus new child tax credits.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Energy costs &amp; business climate</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Would expand natural gas and new energy technology, streamline permitting, and cut regulations to lower electric bills and draw industry.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Amy Acton (D): </span>Would lower bills by adding low-cost, clean power and naming utility regulators who favor ratepayers over utility companies.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Education</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Would raise academic standards, expand parental choice in schooling, pay top teachers more, and grow career-technical education.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Amy Acton (D): </span>Would restore public school funding to the state's constitutional level and keep public funding for public schools only.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Crime &amp; public safety</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Would toughen bail and sentencing for repeat violent offenders and back police to act quickly against crime.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Amy Acton (D): </span>Would fully fund police and first responders and invest in mental-health and addiction treatment alongside law enforcement.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Political tone (&ldquo;One Ohio&rdquo;)</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Frames his campaign as restoring respectful political discourse and uniting Ohioans around shared, common-sense values over partisan division.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p class="na"><span class="vh">Amy Acton (D): </span>Not addressed on campaign site.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Data centers</h4>
+            <p><span class="vh">Vivek Ramaswamy (R): </span>Pledges free electricity for residents near data centers, mandatory full tax payment plus homeowner rebates, and strict environmental rules.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Amy Acton (D): </span>Would require data centers to cover 100% of their own utility costs, use union labor, and meet strict environmental/<wbr>transparency rules.</p>
+          </div>
+          <p class="cmp-sources">Sources: <a href="https://vivekforohio.com/the-plan" target="_blank" rel="noopener noreferrer">Ramaswamy (R)</a> &middot; <a href="https://actonforgovernor.com/issues" target="_blank" rel="noopener noreferrer">Acton (D)</a></p>
+        </section>
+        <section class="cmp-race" aria-labelledby="cmp-sen-title">
+          <h3 id="cmp-sen-title" aria-label="U.S. Senate: Jon Husted (R) vs. Sherrod Brown (D)"><span class="cmp-office">U.S. Senate<span class="vh">:</span></span> Jon Husted<span class="vh"> (R)</span> <span class="cmp-vs">vs.</span> Sherrod Brown<span class="vh"> (D)</span></h3>
+          <div class="cmp-cols" aria-hidden="true"><span class="cmp-col-issue">Issue</span><span><span class="cmp-first">Jon </span>Husted (R)</span><span class="cmp-col-gap"></span><span><span class="cmp-first">Sherrod </span>Brown (D)</span></div>
+          <div class="cmp-card">
+            <h4>Jobs &amp; economic development</h4>
+            <p><span class="vh">Jon Husted (R): </span>Points to helping land Ohio's largest-ever economic development deal (Intel's chip plant) and creating job-training programs like TechCred.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p><span class="vh">Sherrod Brown (D): </span>Site criticizes past corporate tax breaks and trade deals for having shipped Ohio jobs overseas, without naming a current jobs plan.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Taxes &amp; government efficiency</h4>
+            <p><span class="vh">Jon Husted (R): </span>Says he founded InnovateOhio to cut government waste, and backed what was at the time the state's largest income-tax cut.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Life / values</h4>
+            <p><span class="vh">Jon Husted (R): </span>Describes himself as a lifelong "champion for life," a stance he connects to his own adoption out of foster care.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+          </div>
+          <div class="cmp-card">
+            <h4>Law enforcement &amp; public safety</h4>
+            <p><span class="vh">Jon Husted (R): </span>Says he backs police and helped secure millions of dollars in funding for law-enforcement agencies.</p>
+            <span class="cmp-rule" aria-hidden="true"></span>
+            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+          </div>
+          <p class="cmp-sources">Sources: <a href="https://www.jonhustedforsenate.com/bio/" target="_blank" rel="noopener noreferrer">Husted (R)</a> &middot; <a href="https://www.sherrodbrown.com/our-fight/" target="_blank" rel="noopener noreferrer">Brown (D)</a></p>
+        </section>
+      </div>
     </section>
   </div>
   </div>
