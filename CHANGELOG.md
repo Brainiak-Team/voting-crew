@@ -1,6 +1,15 @@
 # Changelog
 
-My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit.
+My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit. From 1.2.0 on, Mainiak adds the tag after merging.
+
+## 1.2.0 (2026-10-29)
+
+Housekeeping. Nothing on the site looks or works differently.
+
+- The repository moved to Mainiak's own GitHub account: https://github.com/JoshuaDBr/voting-crew. Changes now arrive as pull requests from a copy (`Brainiak-Team/voting-crew-1`), and only Mainiak can merge them.
+- The site now deploys from GitHub: each merge into `main` goes live on its own, instead of being sent from the command line.
+- The oldest address, https://voting-crew.vercel.app (still showing 0.4.0), has been deleted, so QR codes from Oct 27 no longer open the site. The flyer's QR code has pointed to https://www.bringyourcrew.com/ since 0.13.0.
+- The README describes the new hosting and release routine, including how to tag a release.
 
 ## 1.1.0 (2026-10-29)
 

@@ -18,4 +18,12 @@ An Election Day checklist: list the friends you will take to the polls (five lin
 
 ## Hosting
 
-Hosted on Vercel, on Mainiak's own account, at https://bringyourcrew.com (forwards to www; DNS at Namecheap). The Vercel address https://voting-crew-eight.vercel.app still works, so older flyers' QR codes keep scanning. votingcrew.com is a spare alias. The project is **not Git-linked** — pushing to the repo does not deploy anything. Deploys are run from the command line via the Vercel REST API, from a tagged commit. The older address, https://voting-crew.vercel.app, still serves an earlier build from the Kangaroof team and has not yet been cleaned up.
+Hosted on Vercel, on Mainiak's own account, at https://bringyourcrew.com (forwards to www; DNS at Namecheap). votingcrew.com is a spare alias. The Vercel address https://voting-crew-eight.vercel.app also still works, so QR codes on the earliest 0.7.0 flyers keep scanning. The oldest address, https://voting-crew.vercel.app, was deleted on Oct 29 2026 and no longer opens the site.
+
+The Vercel project is linked to this repository. Every merge into `main` deploys to the live site on its own; every pull request gets a preview link first.
+
+## Releases
+
+This repository belongs to Mainiak (`JoshuaDBr`), and only he can change it. Updates arrive as pull requests from a copy (fork) of the repository, `Brainiak-Team/voting-crew-1`. Mainiak reviews each one and merges it. Vercel asks him to approve the preview of a pull request from a fork before building it; that approval is optional.
+
+After merging a release, tag it: Releases → Draft a new release → Choose a tag → type the version (for example `1.2.0`, no "v") → Create new tag → target `main` → Publish release. Tag straight after the merge, before anything else is merged.
