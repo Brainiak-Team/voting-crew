@@ -2,6 +2,19 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit. From 1.2.0 on, Mainiak adds the tag after merging.
 
+## 1.4.0 (2026-10-30)
+
+The More screen is re-sourced from a conservative point of view. Each claim now rests on voting records, scorecards, endorsements or quotations, with a source under every claim. Apart from the hint, the main page, the poll, printing and the flyer are unchanged.
+
+- The note under the heading now asks "Which candidates line up with conservative, America-first principles?" It replaces the old line about campaign sites.
+- The issues are Abortion / life, Guns / Second Amendment, Medical Freedom and Education / school choice for Governor, and Election integrity, Immigration / border security, Guns / Second Amendment and Abortion / life for U.S. Senate.
+- Each candidate's answer shows a short verdict (for example "Pro-Life") in the label font, then the statement in the plain reading font (quotes word for word), then a "Source:" link that opens in a new tab and has a 44-pixel tap area.
+- A new section, "What conservative organizations say", gives one box per candidate with the grades, endorsements and quotes from conservative organizations, each with its source. Republican boxes are red and Democratic boxes are grey. On phones they stack Ramaswamy, Husted, Acton, Brown. From 768 pixels wide they form two rows, Ramaswamy | Husted and then Acton | Brown, and boxes in the same row are the same height.
+- One "Sources" section at the bottom replaces the per-race source lines. It is grouped by race, lists each address once in the order it first appears, and puts the two groups side by side from 768 pixels wide. Each entry has a 44-pixel-tall tap area.
+- "Last updated: October 30, 2026" closes the page.
+- The line "Where the candidates stand, issue by issue." is removed from the top of the More screen.
+- The upright hint at the right edge now reads "Swipe for more!" on touch screens and "Click for more!" with a mouse. Every 15 seconds it shows a question instead, alternating "Get to know the candidates!" and "Who do I vote for?". Each blink now stays about three and a half seconds and is gone for one and a half. On short screens the letters shrink so the longest phrase still fits. With reduced motion it stays steady on "Swipe for more!" or "Click for more!".
+
 ## 1.3.0 (2026-10-29)
 
 A new look for the More screen, drawn to match Mainiak's new design. The wording, the sources and everything else on the site are unchanged.
