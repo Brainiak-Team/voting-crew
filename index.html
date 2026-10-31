@@ -602,13 +602,83 @@
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
     }
+    /* ---- Intro screen (1.5.0): shown over the page on every visit; a tap,
+       click or key press anywhere starts the page. ---- */
+    @font-face {
+      font-family: "Dancing Script";
+      src: url("/fonts/dancingscript-latin.woff2") format("woff2");
+      font-weight: 700; font-style: normal; font-display: block;
+    }
+    .intro {
+      --flag-blue: #1a47b8;
+      --intro-font: "Dancing Script", "Brush Script MT", cursive;
+      --u: min(1vw, 0.86vh);           /* one unit that fits both orientations */
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: calc(var(--u) * 2.2);
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background: var(--bg); color: var(--ink); font-family: var(--font);
+      text-align: center; cursor: pointer; overflow: hidden;
+      -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+      transition: opacity .35s ease;
+    }
+    /* Red flag stripes running corner to corner. The script draws them, and
+       breaks each one short of the words, the stars and Ohio. */
+    .intro-stripes { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
+    .intro-stripes path { fill: none; stroke: var(--accent); stroke-linecap: round; }
+    .intro:focus { outline: none; }
+    /* Focus lands on the headline when the intro goes (for screen readers);
+       like the More heading, it shows no frame. */
+    #screen-main h1:focus { outline: none; }
+    .intro.leaving { opacity: 0; pointer-events: none; }
+    .intro-title {
+      margin: 0; font-family: var(--intro-font); font-weight: 700;
+      font-size: min(calc(var(--u) * 15), 132px); line-height: 1.15;
+      color: var(--flag-blue); white-space: nowrap;
+    }
+    .intro-line {
+      margin: 0; font-size: min(calc(var(--u) * 5.4), 44px); line-height: 1.15;
+    }
+    .intro-line + .intro-line { margin-top: calc(var(--u) * -1.2); }
+    .intro-emblem { width: min(calc(var(--u) * 62), 500px); height: auto; overflow: visible; }
+    @media (orientation: portrait) { .intro-emblem { width: min(calc(var(--u) * 84), 500px); } }
+    .intro-ohio { fill: var(--accent); }
+    /* The stars live on their own layer over the whole screen: in flight they
+       pass in front of the words, but they come to rest clear of them. Ohio
+       stays on top, so they fly out from behind it. */
+    .intro-sky { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; fill: var(--flag-blue); }
+    .intro-emblem { position: relative; z-index: 2; }
+    .intro-start {
+      margin-top: calc(var(--u) * 0.6); padding: 4px 12px; border: 0; background: none;
+      font: inherit; font-size: min(calc(var(--u) * 6.2), 40px); color: var(--muted); cursor: pointer;
+      animation: intro-pulse 1.6s ease-in-out infinite alternate;
+    }
+    .intro-start:focus { outline: none; }
+    .intro-start:focus-visible { outline: 3px solid var(--flag-blue); outline-offset: 2px; }
+    @keyframes intro-pulse { to { opacity: .35; } }
+    /* The stars fly out of Ohio as the screen opens. */
+    @media (prefers-reduced-motion: reduce) { .intro { transition: none; } .intro-start { animation: none; } }
+    @media print { .intro { display: none !important; } }
+    /* ---- end intro ---- */
   </style>
 </head>
 <body>
   <noscript>
     <p class="noscript-msg">This list needs JavaScript to run. Even the blank sheet to print and fill in by hand is built by script, so it can't be printed without JavaScript turned on.</p>
-    <style>#pager { display: none; }</style>
+    <style>#pager { display: none; } #intro { display: none; }</style>
   </noscript>
+  <!-- Intro screen (1.5.0). The page script below removes it on the first
+       tap, click or key press. -->
+  <div class="intro" id="intro" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <svg class="intro-stripes" aria-hidden="true" focusable="false"><path/></svg>
+    <p class="intro-title" id="intro-title">Make a List</p>
+    <p class="intro-line">Bring friends to vote!</p>
+    <p class="intro-line">Have 5 times the impact!</p>
+    <svg class="intro-emblem" viewBox="-62 -28 324 260" aria-hidden="true" focusable="false"><defs><path id="intro-star" d="M0.00 -10.00L2.35 -3.24L9.51 -3.09L3.80 1.24L5.88 8.09L0.00 4.00L-5.88 8.09L-3.80 1.24L-9.51 -3.09L-2.35 -3.24Z"/></defs><path class="intro-ohio" transform="translate(47.6 45.0) scale(1.14)" d="M65.6 78.3L65.7 80.7L64.3 81.0L64.3 81.3L64.5 82.0L65.3 82.9L65.4 85.4L63.0 86.7L62.2 86.7L61.8 86.3L62.5 85.3L61.7 83.6L60.2 82.5L59.5 82.6L59.2 83.5L58.3 84.1L57.3 87.1L55.5 89.3L56.3 90.8L56.5 94.4L56.1 94.7L54.7 94.6L54.1 95.1L53.6 98.2L53.2 98.9L48.3 100.0L47.6 99.5L45.4 96.1L44.7 95.7L43.4 95.6L42.3 94.9L41.7 92.3L41.7 90.6L41.3 90.2L39.3 91.0L38.3 91.0L35.6 93.9L32.9 94.4L31.0 92.9L27.8 91.6L25.5 92.3L25.0 93.6L24.4 93.7L22.5 93.0L22.3 92.4L20.3 90.0L18.3 89.3L16.0 89.8L13.0 88.8L12.6 88.1L12.5 86.3L11.0 83.1L8.3 80.7L7.0 80.5L4.3 81.3L2.9 80.5L2.2 79.5L1.6 79.2L0.7 80.1L0.0 80.4L0.4 40.6L0.3 7.9L29.2 6.9L29.4 7.6L30.2 8.0L31.3 8.1L31.9 7.7L34.0 9.3L37.1 10.4L38.3 11.8L39.6 12.7L40.3 13.0L41.3 12.7L42.0 12.0L41.9 11.2L42.5 10.9L43.5 12.2L44.9 12.2L45.1 12.6L44.9 12.9L45.1 13.4L45.6 13.6L47.1 15.4L49.3 16.6L50.0 16.7L52.5 15.4L54.8 15.2L56.3 14.1L60.0 12.9L61.6 13.6L62.9 13.8L64.7 13.5L65.7 13.7L68.8 11.7L70.3 10.2L71.2 9.7L72.2 8.5L75.5 6.1L76.3 6.1L81.4 3.5L83.8 3.0L85.9 1.9L87.6 1.6L91.9 0.0L91.9 37.5L91.0 37.9L89.6 38.0L88.8 39.0L90.2 41.8L89.8 44.7L90.2 46.5L88.0 51.1L87.4 53.7L87.2 56.2L85.7 57.8L85.3 63.6L84.2 66.0L82.9 66.3L81.2 67.8L77.0 72.5L75.9 72.5L74.2 73.7L73.6 73.8L73.2 73.5L72.8 72.3L71.9 71.9L70.1 73.5L68.7 75.6L66.8 76.5Z"/></svg>
+    <svg class="intro-sky" aria-hidden="true" focusable="false"><defs><path id="intro-star" d="M0.00 -10.00L2.35 -3.24L9.51 -3.09L3.80 1.24L5.88 8.09L0.00 4.00L-5.88 8.09L-3.80 1.24L-9.51 -3.09L-2.35 -3.24Z"/></defs><g></g></svg>
+    <button class="intro-start" id="intro-start" type="button"><span class="intro-tap">Tap</span> anywhere to start!</button>
+  </div>
+  <!-- end intro -->
   <div class="pager" id="pager">
   <div class="track" id="track">
   <div class="screen screen-main" id="screen-main">
@@ -1313,6 +1383,178 @@
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(start)
         .catch(function () { setOddsShown(false); });
+    })();
+  </script>
+  <script>
+    // ---- Intro screen (1.5.0) ----
+    // Shown on every visit. Until it goes, the page behind is out of reach
+    // of keyboard and screen readers.
+    (function () {
+      var intro = document.getElementById('intro');
+      var pager = document.getElementById('pager');
+      if (!intro) return;
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) intro.querySelector('.intro-tap').textContent = 'Click';
+      pager.inert = true; pager.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = 'hidden';
+      intro.focus({ preventScroll: true });
+      var gone = false;
+      function start(e) {
+        if (gone) return;
+        if (e && e.type === 'keydown' && (e.ctrlKey || e.metaKey || e.altKey || e.key === 'Tab' || e.key === 'Shift')) return;
+        gone = true;
+        if (e) e.preventDefault();
+        pager.inert = false; pager.removeAttribute('aria-hidden');
+        document.documentElement.style.overflow = '';
+        intro.classList.add('leaving');
+        var quick = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(function () { intro.remove(); }, quick ? 0 : 350);
+        var to = document.querySelector('#screen-main h1');
+        if (to) { to.tabIndex = -1; to.focus({ preventScroll: true }); }
+      }
+      // Stars: 17 thrown outward from Ohio in every direction (Mainiak, Oct 31).
+      // Seven stay close and ring a clear patch around Ohio; the rest fly far,
+      // growing as they go. Where a star would come to rest on the words it
+      // slides along its path (or turns a little) until it is clear of them.
+      var sky = intro.querySelector('.intro-sky'), skyG = sky.querySelector('g'), stars = [], pocket = null, geo = null;
+      // Five layouts per orientation, each a fixed seed for the placement
+      // below (chosen Oct 31). One is picked at random on each visit; turning
+      // the screen switches to the same-numbered layout for the new shape.
+      var SEEDS = { upright: [2, 3, 4, 5, 7], sideways: [1, 2, 5, 6, 7] };
+      var pick = Math.floor(Math.random() * 5), SEED = 1;
+      function rnd(i) { var x = Math.sin(i * 12.9898 + SEED * 78.233) * 43758.5453; return x - Math.floor(x); }
+      function textRects(pad) {
+        return [].map.call(intro.querySelectorAll('.intro-title, .intro-line, .intro-start'), function (e) {
+          var r = e.getBoundingClientRect();
+          if (e.classList.contains('intro-title')) { var rg = document.createRange(); rg.selectNodeContents(e); r = rg.getBoundingClientRect(); }
+          return [r.left - pad, r.top - pad, r.right + pad, r.bottom + pad];
+        });
+      }
+      function placeStars() {
+        var W = intro.clientWidth, H = intro.clientHeight;
+        SEED = SEEDS[W > H ? 'sideways' : 'upright'][pick];
+        var u = Math.min(W / 100, H * 0.0086);
+        var o = intro.querySelector('.intro-ohio').getBoundingClientRect();
+        var cx = (o.left + o.right) / 2, cy = (o.top + o.bottom) / 2;
+        var ax = o.width / 2 + u * 7, ay = o.height / 2 + u * 6;      // the inner ring
+        pocket = [cx, cy, ax + u * 4, ay + u * 4];
+        var sw = u * 3.2, pad = u * 2 + sw / 2, rects = textRects(pad);   // for the stripes
+        rects.push([o.left - pad, o.top - pad, o.right + pad, o.bottom + pad]);
+        geo = { W: W, H: H, u: u, sw: sw, pad: pad, rects: rects, cx: cx, cy: cy, ow: o.width / 2, oh: o.height / 2 };
+        var words = textRects(u * 1.5), edge = u * 2, n = 17, far = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+        stars = [];
+        function clear(x, y, r) {
+          if (x - r < edge || y - r < edge || x + r > W - edge || y + r > H - edge) return false;
+          for (var i = 0; i < words.length; i++) { var q = words[i]; if (x + r > q[0] && x - r < q[2] && y + r > q[1] && y - r < q[3]) return false; }
+          var ex = (x - cx) / (o.width / 2 + r + u), ey = (y - cy) / (o.height / 2 + r + u);
+          if (ex * ex + ey * ey < 1) return false;
+          for (var j = 0; j < stars.length; j++) { var s = stars[j]; if (Math.hypot(x - s.x, y - s.y) < r + s.r + u * 2) return false; }
+          return true;
+        }
+        function toEdge(a) {   // distance from Ohio's centre to the screen edge along a
+          var c = Math.cos(a), s = Math.sin(a), t = Infinity;
+          if (c > 0) t = Math.min(t, (W - cx) / c); if (c < 0) t = Math.min(t, -cx / c);
+          if (s > 0) t = Math.min(t, (H - cy) / s); if (s < 0) t = Math.min(t, -cy / s);
+          return t;
+        }
+        for (var i = 0; i < n; i++) {
+          var a = (-90 + (i + 0.5) * 360 / n + (rnd(i) - 0.5) * (200 / n)) * Math.PI / 180;
+          var inner = i % 5 === 0 || i % 5 === 3, c = Math.cos(a), s = Math.sin(a);
+          var ring = 1 / Math.sqrt(c * c / (ax * ax) + s * s / (ay * ay));   // ellipse radius along a
+          var d = inner ? ring : ring + (toEdge(a) - ring) * (0.45 + rnd(i + 31) * 0.5);
+          // Of the clear spots near its path, take the one closest to the
+          // planned landing place; turning aside costs more than sliding along.
+          // If a crowded screen has no such spot, look all the way round and
+          // let the star be a little smaller, so all 17 always land.
+          var spot = null, best = Infinity;
+          for (var pass = 0; pass < 2 && !spot; pass++) {
+          var lo = inner ? ring * 0.9 : ring + u * (pass ? 4 : 10), turns = pass ? 45 : 8, shrink = pass ? 0.75 : 1;
+          for (var turn = -turns; turn <= turns; turn++) {
+            var bA = a + turn * 0.07, cb = Math.cos(bA), sb = Math.sin(bA), hi = toEdge(bA);
+            for (var dd = lo; dd < hi; dd += u) {
+              var cost = Math.abs(dd - d) / u + Math.abs(turn) * 4;
+              if (cost >= best) continue;
+              var r = (inner ? u * 3 : Math.min(u * 3.4 + (dd - ring) * 0.09, u * 14)) * shrink;
+              var x = cx + cb * dd, y = cy + sb * dd;
+              if (clear(x, y, r)) { spot = { x: x, y: y, r: r }; best = cost; }
+            }
+          }
+          }
+          if (!spot) continue;   // still no room (a tiny screen): one star fewer
+          spot.rot = Math.round((rnd(i + 7) - 0.5) * 50);
+          spot.inner = inner;
+          stars.push(spot);
+        }
+        skyG.innerHTML = stars.map(function (p) {
+          return '<g><use href="#intro-star" transform="translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) +
+            ') rotate(' + p.rot + ') scale(' + (p.r / 10).toFixed(3) + ')"/></g>';
+        }).join('');
+        stars.forEach(function (p, i) { p.el = skyG.children[i]; });
+        sky.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      }
+      // Stripes: lines at 45 degrees, every gap a stripe and a half wide. Each
+      // line is walked in small steps; wherever it would come near a word, a
+      // star or Ohio it lifts, so it ends in a rounded tip short of them.
+      var stripes = intro.querySelector('.intro-stripes'), stripePath = stripes.querySelector('path');
+      function drawStripes() {
+        var W = geo.W, H = geo.H, u = geo.u, sw = geo.sw, pad = geo.pad, rects = geo.rects;
+        var dots = stars.filter(function (s) { return s.k > 0; }).map(function (s) { return [s.cx, s.cy, s.r * s.k * 1.05 + pad]; });
+        var pk = [pocket[0], pocket[1], Math.max(geo.ow, pocket[2] * ringNow), Math.max(geo.oh, pocket[3] * ringNow)];
+        function blocked(x, y) {
+          for (var i = 0; i < rects.length; i++) { var q = rects[i]; if (x > q[0] && x < q[2] && y > q[1] && y < q[3]) return true; }
+          var ex = (x - pk[0]) / pk[2], ey = (y - pk[1]) / pk[3];
+          if (ex * ex + ey * ey < 1) return true;
+          for (var j = 0; j < dots.length; j++) { var d = dots[j], dx = x - d[0], dy = y - d[1]; if (dx * dx + dy * dy < d[2] * d[2]) return true; }
+          return false;
+        }
+        var step = 2, gap = u * 8.4 * Math.SQRT2, min = sw * 1.2, out = [];
+        stripes.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        stripePath.style.strokeWidth = sw;
+        for (var c = -H + (W % gap) / 2; c < W + sw; c += gap) {
+          var t0 = Math.max(0, -c) - sw, t1 = Math.min(H, W - c) + sw, run = null;
+          for (var t = t0; t <= t1 + step; t += step) {
+            var free = t <= t1 && !blocked(c + t, t);
+            if (free && run === null) run = t;
+            if (!free && run !== null) {
+              var a = run + sw / 2, b = t - step - sw / 2;
+              if (b - a > min || (run <= t0 && b > a)) out.push('M' + (c + a).toFixed(1) + ' ' + a.toFixed(1) + 'L' + (c + b).toFixed(1) + ' ' + b.toFixed(1));
+              run = null;
+            }
+          }
+        }
+        stripePath.setAttribute('d', out.join(''));
+      }
+      // The burst. Each star shoots out of Ohio, covering most of the way in
+      // the first third of a second, then glides the last stretch slowly and
+      // settles (Mainiak, Oct 31 2:33 PM). The stripes give way as each star
+      // passes and close up behind it.
+      var DELAY = 250, STAGGER = 12, DUR = 1300, clock = null, ringNow = 1;
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) clock = performance.now() + DELAY;
+      function ease(t) { return 1 - Math.pow(1 - t, 4.5); }
+      function frame(once) {
+        var now = performance.now(), busy = false, ring = 0, nIn = 0;
+        stars.forEach(function (p, i) {
+          var t = clock === null ? 1 : Math.max(0, Math.min(1, (now - clock - i * STAGGER) / DUR));
+          if (t < 1) busy = true;
+          var e = ease(t);
+          p.k = t > 0 ? 0.15 + 0.85 * e : 0;                       // size
+          p.cx = geo.cx + (p.x - geo.cx) * e; p.cy = geo.cy + (p.y - geo.cy) * e;
+          if (p.inner) { ring += e; nIn++; }
+          p.el.setAttribute('transform', 'translate(' + p.cx.toFixed(1) + ' ' + p.cy.toFixed(1) + ') scale(' + p.k.toFixed(3) + ') translate(' + (-p.x).toFixed(1) + ' ' + (-p.y).toFixed(1) + ')');
+          p.el.style.opacity = Math.min(1, t / 0.12);
+        });
+        ringNow = nIn ? ring / nIn : 1;
+        drawStripes();
+        if (once) return;
+        if (busy && !gone) requestAnimationFrame(function () { frame(); }); else clock = null;
+      }
+      function layout() { placeStars(); frame(clock !== null); }   // mid-burst, the running loop carries on
+      intro.redraw = layout;
+      placeStars(); frame();
+      if (document.fonts) document.fonts.ready.then(function () { if (!gone) layout(); });
+      var resizeFrame;
+      window.addEventListener('resize', function () { if (gone) return; cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(layout); });
+      intro.addEventListener('click', start);
+      document.addEventListener('keydown', function k(e) { if (gone) return document.removeEventListener('keydown', k); start(e); });
     })();
   </script>
 </body>
