@@ -322,7 +322,7 @@
     .more-intro { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
     /* Long reading text in a regular font; Archivo Black stays on headings,
        issue names and labels. */
-    .cmp-note, .cmp-sources, .cmp-card p { font-family: var(--print-font); font-weight: 400; font-synthesis: none; }
+    .cmp-note, .cmp-sources, .cmp-card p, .cmp-src, .org-item p, .cmp-srcs li, .cmp-updated { font-family: var(--print-font); font-weight: 400; font-synthesis: none; }
     .cmp-note { margin: 0 0 28px; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
     .cmp-races { display: flex; flex-direction: column; gap: 44px; }
     /* Races: a heavy rule and a big gap. Issues: only a small gap. */
@@ -391,6 +391,57 @@
       .cmp-card p { font-size: 16px; line-height: 1.5; text-wrap: pretty; }
       .cmp-rule { align-self: stretch; }
       .cmp-sources { margin-top: 4px; font-size: 14px; }
+    }
+
+    /* ---- 1.4.0 More screen: positions, organizations, sources ---- */
+    .cmp-lead { margin: 0 0 28px; font-size: 18px; line-height: 1.25; text-wrap: balance; }
+    .cmp-pos { min-width: 0; }
+    .cmp-verdict { display: block; margin-bottom: 4px; font-weight: 400; font-size: 15px; line-height: 1.2; }
+    /* Source line under each position: small, but pure white for contrast. */
+    .cmp-src { position: relative; display: block; margin-top: 8px; font-size: 13px; line-height: 1.35; overflow-wrap: break-word; }
+    .cmp-src a { color: #ffffff; }
+    /* Tap area: the whole source line, at least 44px tall, even when the link wraps. */
+    .cmp-src a::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 100%; min-height: 44px; transform: translateY(-50%); }
+    /* Organizations: one box per candidate. DOM order Vivek, Husted, Acton,
+       Brown: stacked on phones; two columns from 768px give
+       Vivek | Husted over Acton | Brown. */
+    .org-grid { display: grid; gap: 12px; }
+    .org-box { border-radius: 16px; padding: 16px 16px 18px; color: #ffffff; min-width: 0; }
+    .org-r { background: var(--cmp-from); }
+    .org-d { background: var(--cmp-to); }
+    .org-box h4 { margin: 0 0 4px; font-size: 18px; font-weight: 400; line-height: 1.2; }
+    .org-office { display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .org-item { margin-top: 14px; }
+    .org-item strong { display: block; font-weight: 400; font-size: 15px; line-height: 1.25; }
+    .org-item p { margin: 4px 0 0; font-size: 14px; line-height: 1.45; overflow-wrap: break-word; }
+    /* Sources for the whole page, grouped by race. */
+    .cmp-srcs { margin-top: 56px; border-top: 2px solid var(--ink); padding-top: 14px; }
+    .cmp-srcs h3 { margin: 0 0 12px; font-family: var(--head-font); font-weight: 400; font-size: 24px; line-height: 1.1; text-transform: uppercase; }
+    .cmp-srcs-groups { display: grid; gap: 20px; }
+    .cmp-srcs h4 { margin: 0 0 6px; font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .cmp-srcs ul { margin: 0; padding: 0; list-style: none; }
+    /* Each entry is a full 44px tap area; longer titles wrap and grow it. */
+    .cmp-srcs li { position: relative; display: flex; align-items: center; box-sizing: border-box; min-height: 44px; margin: 0; padding: 6px 0; font-size: 13px; line-height: 1.35; color: var(--muted); }
+    .cmp-srcs a { color: var(--ink); }
+    .cmp-srcs a::after { content: ""; position: absolute; inset: 0; }
+    .cmp-srcs a:hover { color: var(--accent); }
+    .cmp-updated { margin: 28px 0 0; font-size: 12px; color: var(--muted); }
+    @media (min-width: 768px) {
+      .cmp-lead { margin-bottom: 48px; font-size: 24px; }
+      .cmp-verdict { font-size: 17px; margin-bottom: 6px; }
+      .cmp-src { margin-top: 10px; font-size: 14px; }
+      .org-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+      .org-box { border-radius: 18px; padding: 22px 26px 24px; }
+      .org-box h4 { font-size: 22px; }
+      .org-office { font-size: 12px; }
+      .org-item { margin-top: 16px; }
+      .org-item strong { font-size: 16px; }
+      .org-item p { font-size: 15px; }
+      .cmp-srcs { margin-top: 80px; border-top-width: 3px; padding-top: 18px; }
+      .cmp-srcs h3 { font-size: 30px; margin-bottom: 16px; }
+      .cmp-srcs-groups { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
+      .cmp-srcs h4 { font-size: 12px; }
+      .cmp-srcs li { font-size: 14px; }
     }
 
     /* Reduced motion: screens switch without sliding, and the hint stays
@@ -613,80 +664,137 @@
         <h2 id="more-title" tabindex="-1">More</h2>
       </div>
       <p class="more-intro">Where the candidates stand, issue by issue.</p>
-      <p class="cmp-note">Issues below are taken from each race's Republican candidate's own campaign site. Each candidate's position &mdash; including the Democratic candidate's &mdash; is drawn from that candidate's own campaign site. Where a site does not address an issue, the cell says so.</p>
+      <p class="cmp-lead">Which candidates line up with conservative, America-first principles?</p>
 
       <div class="cmp-races">
         <section class="cmp-race" aria-labelledby="cmp-gov-title">
           <h3 id="cmp-gov-title" aria-label="Governor: Vivek Ramaswamy (R) vs. Amy Acton (D)"><span class="cmp-office">Governor<span class="vh">:</span></span> Vivek Ramaswamy<span class="vh"> (R)</span> <span class="cmp-vs">vs.</span> Amy Acton<span class="vh"> (D)</span></h3>
           <div class="cmp-cols" aria-hidden="true"><span class="cmp-col-issue">Issue</span><span><span class="cmp-first">Vivek </span>Ramaswamy (R)</span><span class="cmp-col-gap"></span><span><span class="cmp-first">Amy </span>Acton (D)</span></div>
           <div class="cmp-card">
-            <h4>Taxes</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Wants to cut property taxes right away and phase out Ohio's income tax, starting with eliminating the capital-gains tax.</p>
+            <h4>Abortion / life</h4>
+            <div class="cmp-pos"><span class="vh">Vivek Ramaswamy (R): </span><strong class="cmp-verdict">Pro-Life</strong><p>“I’m unapologetically pro-life,” “I believe in the importance of the crisis pregnancy care network, which I’m going to help fund,”</p><span class="cmp-src">Source: <a href="https://ohiocapitaljournal.com/2026/10/28/where-ohios-candidates-for-governor-stand-on-abortion/" target="_blank" rel="noopener noreferrer">Where Ohio's candidates for governor stand on abortion, 10/28/2026</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Amy Acton (D): </span>Says her top priority is a tax cut for working families: an earned-income credit plus new child tax credits.</p>
+            <div class="cmp-pos"><span class="vh">Amy Acton (D): </span><strong class="cmp-verdict">Pro-Abortion</strong><p>"I will protect reproductive freedom so that every woman can access safe, legal abortion..."</p><span class="cmp-src">Source: <a href="https://actonforgovernor.com/issue/ensuring-reproductive-freedom/" target="_blank" rel="noopener noreferrer">Acton's own campaign website</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Energy costs &amp; business climate</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Would expand natural gas and new energy technology, streamline permitting, and cut regulations to lower electric bills and draw industry.</p>
+            <h4>Guns / Second Amendment</h4>
+            <div class="cmp-pos"><span class="vh">Vivek Ramaswamy (R): </span><strong class="cmp-verdict">Pro 2nd Amendment</strong><p>"I will be the most pro-Constitution, pro-freedom, pro-2A governor this state has ever had,"</p><span class="cmp-src">Source: <a href="https://www.buckeyefirearms.org/ramaswamy-v-acton-choice-clear-gun-rights-even-if-dr-lockdown-masks-her-views" target="_blank" rel="noopener noreferrer">Ramaswamy v. Acton: Choice is clear, 09/10/2026</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Amy Acton (D): </span>Would lower bills by adding low-cost, clean power and naming utility regulators who favor ratepayers over utility companies.</p>
+            <div class="cmp-pos"><span class="vh">Amy Acton (D): </span><strong class="cmp-verdict">Pro Gun-control</strong><p>Mostly silent on the topic, removed info from campaign site. Supports stronger background checks and red-flag laws.</p><span class="cmp-src">Source: <a href="https://www.buckeyefirearms.org/ramaswamy-v-acton-choice-clear-gun-rights-even-if-dr-lockdown-masks-her-views" target="_blank" rel="noopener noreferrer">Ramaswamy v. Acton: Choice is clear, 09/10/2026</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Education</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Would raise academic standards, expand parental choice in schooling, pay top teachers more, and grow career-technical education.</p>
+            <h4>Medical Freedom</h4>
+            <div class="cmp-pos"><span class="vh">Vivek Ramaswamy (R): </span><strong class="cmp-verdict">Mostly Pro-freedom</strong><p>Showed some support for lockdowns. Has since strongly opposed. “No mask mandates,... No vaccine mandates. No lockdown ever again.”</p><span class="cmp-src">Source: <a href="https://www.dailysignal.com/2023/08/31/no-lockdown-ever-again-2024-candidates-push-back-against-future-covid-lockdowns-mandates/" target="_blank" rel="noopener noreferrer">2024 Candidates Push Back Against Future COVID-19 Lockdowns, Mandates</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Amy Acton (D): </span>Would restore public school funding to the state's constitutional level and keep public funding for public schools only.</p>
+            <div class="cmp-pos"><span class="vh">Amy Acton (D): </span><strong class="cmp-verdict">Strongly Pro-Lockdown</strong><p>As Ohio Department of Health Director in 2020, Acton strongly advocated for strong lockdown rules.</p><span class="cmp-src">Source: <a href="https://www.politico.com/news/magazine/2025/06/28/amy-acton-ohio-governor-covid-vivek-ramaswamy-00425789" target="_blank" rel="noopener noreferrer">Can 'Ohio's Anthony Fauci' Beat Vivek Ramaswamy?</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Crime &amp; public safety</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Would toughen bail and sentencing for repeat violent offenders and back police to act quickly against crime.</p>
+            <h4>Education / school choice</h4>
+            <div class="cmp-pos"><span class="vh">Vivek Ramaswamy (R): </span><strong class="cmp-verdict">Pro School-choice</strong><p>Strongly supports giving parents right to choose where to send their children.</p><span class="cmp-src">Source: <a href="https://www.wosu.org/politics-government/2025-08-21/ohio-governor-candidate-vivek-ramaswamy-gives-his-vision-for-education-at-hilliard-event" target="_blank" rel="noopener noreferrer">Ramaswamy gives his vision for education at Hilliard event, 08/21/2025</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Amy Acton (D): </span>Would fully fund police and first responders and invest in mental-health and addiction treatment alongside law enforcement.</p>
+            <div class="cmp-pos"><span class="vh">Amy Acton (D): </span><strong class="cmp-verdict">Anti School-choice</strong><p>Plans to restrict tax dollars from private or homeschooling. "Public money should be for public schools."</p><span class="cmp-src">Source: <a href="https://actonforgovernor.com/issue/education/" target="_blank" rel="noopener noreferrer">Acton's own campaign website (education)</a></span></div>
           </div>
-          <div class="cmp-card">
-            <h4>Political tone (&ldquo;One Ohio&rdquo;)</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Frames his campaign as restoring respectful political discourse and uniting Ohioans around shared, common-sense values over partisan division.</p>
-            <span class="cmp-rule" aria-hidden="true"></span>
-            <p class="na"><span class="vh">Amy Acton (D): </span>Not addressed on campaign site.</p>
-          </div>
-          <div class="cmp-card">
-            <h4>Data centers</h4>
-            <p><span class="vh">Vivek Ramaswamy (R): </span>Pledges free electricity for residents near data centers, mandatory full tax payment plus homeowner rebates, and strict environmental rules.</p>
-            <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Amy Acton (D): </span>Would require data centers to cover 100% of their own utility costs, use union labor, and meet strict environmental/<wbr>transparency rules.</p>
-          </div>
-          <p class="cmp-sources">Sources: <a href="https://vivekforohio.com/the-plan" target="_blank" rel="noopener noreferrer">Ramaswamy (R)</a> &middot; <a href="https://actonforgovernor.com/issues" target="_blank" rel="noopener noreferrer">Acton (D)</a></p>
         </section>
         <section class="cmp-race" aria-labelledby="cmp-sen-title">
           <h3 id="cmp-sen-title" aria-label="U.S. Senate: Jon Husted (R) vs. Sherrod Brown (D)"><span class="cmp-office">U.S. Senate<span class="vh">:</span></span> Jon Husted<span class="vh"> (R)</span> <span class="cmp-vs">vs.</span> Sherrod Brown<span class="vh"> (D)</span></h3>
           <div class="cmp-cols" aria-hidden="true"><span class="cmp-col-issue">Issue</span><span><span class="cmp-first">Jon </span>Husted (R)</span><span class="cmp-col-gap"></span><span><span class="cmp-first">Sherrod </span>Brown (D)</span></div>
           <div class="cmp-card">
-            <h4>Jobs &amp; economic development</h4>
-            <p><span class="vh">Jon Husted (R): </span>Points to helping land Ohio's largest-ever economic development deal (Intel's chip plant) and creating job-training programs like TechCred.</p>
+            <h4>Election integrity</h4>
+            <div class="cmp-pos"><span class="vh">Jon Husted (R): </span><strong class="cmp-verdict">Pro Voter-ID</strong><p>Offered a Senate amendment requiring photo ID to vote.</p><span class="cmp-src">Source: <a href="https://www.cbsnews.com/news/save-america-act-photo-id-amendment-senate-vote/" target="_blank" rel="noopener noreferrer">Senate rejects Husted photo-ID amendment, 03/26/2026</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p><span class="vh">Sherrod Brown (D): </span>Site criticizes past corporate tax breaks and trade deals for having shipped Ohio jobs overseas, without naming a current jobs plan.</p>
+            <div class="cmp-pos"><span class="vh">Sherrod Brown (D): </span><strong class="cmp-verdict">Anti Voter-ID</strong><p>Called the photo-ID requirement an "unnecessary barrier." "It's wrong that people are trying to sow distrust in our election systems."</p><span class="cmp-src">Source: <a href="https://www.daytondailynews.com/local/husted-push-for-federal-voter-id-fails-brown-calls-it-unnecessary/2KBRVHMWTZGUXI3BZQOMQOQADQ/" target="_blank" rel="noopener noreferrer">Husted push for federal voter ID fails; Brown calls it unnecessary, 03/24/2026</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Taxes &amp; government efficiency</h4>
-            <p><span class="vh">Jon Husted (R): </span>Says he founded InnovateOhio to cut government waste, and backed what was at the time the state's largest income-tax cut.</p>
+            <h4>Immigration / border security</h4>
+            <div class="cmp-pos"><span class="vh">Jon Husted (R): </span><strong class="cmp-verdict">Pro Border-security</strong><p>Given a score of 100% on border security by Turning Point Action.</p><span class="cmp-src">Source: <a href="https://www.tpaction.com/scorecard/legislators/jonhusted" target="_blank" rel="noopener noreferrer">Turning Point Action scorecard: Jon Husted</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+            <div class="cmp-pos"><span class="vh">Sherrod Brown (D): </span><strong class="cmp-verdict">Anti Border-enforcement</strong><p>Voted against restarting border wall construction, hiring more Border Patrol agents, and ending catch and release.</p><span class="cmp-src">Source: <a href="https://www.nrsc.org/press-releases/sherrod-brown-wont-answer-if-ice-should-be-abolished-2026-08-28/" target="_blank" rel="noopener noreferrer">Sherrod Brown Won't Answer if ICE Should be Abolished, 08/28/2026</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Life / values</h4>
-            <p><span class="vh">Jon Husted (R): </span>Describes himself as a lifelong "champion for life," a stance he connects to his own adoption out of foster care.</p>
+            <h4>Guns / Second Amendment</h4>
+            <div class="cmp-pos"><span class="vh">Jon Husted (R): </span><strong class="cmp-verdict">Pro 2nd Amendment</strong><p>NRA grade A: "Solidly pro-gun candidate."</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+            <div class="cmp-pos"><span class="vh">Sherrod Brown (D): </span><strong class="cmp-verdict">Pro Gun-control</strong><p>NRA grade F: "True enemy of gun owners' rights."</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
           </div>
           <div class="cmp-card">
-            <h4>Law enforcement &amp; public safety</h4>
-            <p><span class="vh">Jon Husted (R): </span>Says he backs police and helped secure millions of dollars in funding for law-enforcement agencies.</p>
+            <h4>Abortion / life</h4>
+            <div class="cmp-pos"><span class="vh">Jon Husted (R): </span><strong class="cmp-verdict">Pro-Life</strong><p>100% voting record with National Right to Life. Endorsed by National Right to Life.</p><span class="cmp-src">Source: <a href="https://nrlc.org/communications/nrl-endorses-senator-jon-husted-for-election-to-the-u-s-senate/" target="_blank" rel="noopener noreferrer">National Right to Life endorses Senator Jon Husted, 09/03/2026</a></span></div>
             <span class="cmp-rule" aria-hidden="true"></span>
-            <p class="na"><span class="vh">Sherrod Brown (D): </span>Not addressed on campaign site.</p>
+            <div class="cmp-pos"><span class="vh">Sherrod Brown (D): </span><strong class="cmp-verdict">Pro-Abortion</strong><p>"I support abortion access for all women."</p><span class="cmp-src">Source: <a href="https://www.cbsnews.com/news/sherrod-brown-abortion-access-ohio-senate-reelection/" target="_blank" rel="noopener noreferrer">Sherrod Brown focuses on abortion access in reelection race, 11/28/2023</a></span></div>
           </div>
-          <p class="cmp-sources">Sources: <a href="https://www.jonhustedforsenate.com/bio/" target="_blank" rel="noopener noreferrer">Husted (R)</a> &middot; <a href="https://www.sherrodbrown.com/our-fight/" target="_blank" rel="noopener noreferrer">Brown (D)</a></p>
+        </section>
+        <section class="cmp-race cmp-orgs" aria-labelledby="cmp-org-title">
+          <h3 id="cmp-org-title" aria-label="More: what conservative organizations say"><span class="cmp-office">More<span class="vh">:</span></span> What conservative organizations say</h3>
+          <div class="org-grid">
+            <section class="org-box org-r" aria-labelledby="org-ramaswamy">
+              <h4 id="org-ramaswamy"><span class="org-office">Governor<span class="vh">:</span></span> Vivek Ramaswamy (R)</h4>
+              <div class="org-item"><strong>NRA-PVF</strong><p>Grade AQ: pro-gun.</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
+              <div class="org-item"><strong>Buckeye Firearms Association PAC</strong><p>Endorsed, as a "tested pro-gun candidate."</p><span class="cmp-src">Source: <a href="https://www.buckeyefirearms.org/bfa-pac-endorses-vivek-ramaswamy-ohio-governor" target="_blank" rel="noopener noreferrer">BFA-PAC endorses Vivek Ramaswamy for Ohio governor, 04/15/2026</a></span></div>
+              <div class="org-item"><strong>SBA Pro-Life America</strong><p>Endorsed, July 9, 2026.</p><span class="cmp-src">Source: <a href="https://sbaprolife.org/newsroom/press-releases/leading-natl-pro-life-group-endorses-vivek-ramaswamy-for-ohio-governor" target="_blank" rel="noopener noreferrer">SBA Pro-Life America endorses Vivek Ramaswamy, 07/09/2026</a></span></div>
+              <div class="org-item"><strong>Ohio Right to Life PAC</strong><p>Recommended for the 2026 general election, Aug 10, 2026.</p><span class="cmp-src">Source: <a href="https://ohiolife.org/ohio-right-to-life-pac-announces-2026-general-election-candidate-recommendations/" target="_blank" rel="noopener noreferrer">Ohio Right to Life PAC 2026 general election recommendations, 08/10/2026</a></span></div>
+              <div class="org-item"><strong>Right to Life Action Coalition of Ohio</strong><p>Endorsed. “Vivek is unequivocally pro-Life, as he is convicted in his belief that life begins at conception." – Kate Makra, President</p><span class="cmp-src">Source: <a href="https://rtlaohio.org/news/rtlaco-endorses-vivek-ramaswamy-1" target="_blank" rel="noopener noreferrer">RTLACO endorses Vivek Ramaswamy</a></span></div>
+            </section>
+            <section class="org-box org-r" aria-labelledby="org-husted">
+              <h4 id="org-husted"><span class="org-office">U.S. Senate<span class="vh">:</span></span> Jon Husted (R)</h4>
+              <div class="org-item"><strong>Heritage Action</strong><p>79%, session and lifetime (119th Congress).</p><span class="cmp-src">Source: <a href="https://heritageaction.com/scorecard/members/H001104" target="_blank" rel="noopener noreferrer">Heritage Action scorecard: Jon Husted</a></span></div>
+              <div class="org-item"><strong>Turning Point Action</strong><p>80% overall. 100% on Border Security and on Health &amp; Medical Freedom.</p><span class="cmp-src">Source: <a href="https://www.tpaction.com/scorecard/legislators/jonhusted" target="_blank" rel="noopener noreferrer">Turning Point Action scorecard: Jon Husted</a></span></div>
+              <div class="org-item"><strong>NRA-PVF</strong><p>Grade A: "Solidly pro-gun candidate."</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
+              <div class="org-item"><strong>National Right to Life</strong><p>Endorsed. 100% voting record since joining the Senate in January 2025.</p><span class="cmp-src">Source: <a href="https://nrlc.org/communications/nrl-endorses-senator-jon-husted-for-election-to-the-u-s-senate/" target="_blank" rel="noopener noreferrer">National Right to Life endorses Senator Jon Husted, 09/03/2026</a></span></div>
+              <div class="org-item"><strong>Ohio Right to Life PAC</strong><p>Recommended for the 2026 general election, Aug 10, 2026.</p><span class="cmp-src">Source: <a href="https://ohiolife.org/ohio-right-to-life-pac-announces-2026-general-election-candidate-recommendations/" target="_blank" rel="noopener noreferrer">Ohio Right to Life PAC 2026 general election recommendations, 08/10/2026</a></span></div>
+            </section>
+            <section class="org-box org-d" aria-labelledby="org-acton">
+              <h4 id="org-acton"><span class="org-office">Governor<span class="vh">:</span></span> Amy Acton (D)</h4>
+              <div class="org-item"><strong>NRA-PVF</strong><p>Grade F.</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
+              <div class="org-item"><strong>Buckeye Firearms Association</strong><p>"Acton, a Democrat, worked as a volunteer on the 2008 campaign for Barack Obama, a staunch gun control advocate. That alone should raise concerns..."</p><span class="cmp-src">Source: <a href="https://www.buckeyefirearms.org/3-new-gun-control-bills-introduced-ohio-house" target="_blank" rel="noopener noreferrer">3 New Gun Control Bills Introduced in Ohio House, 05/26/2020</a></span></div>
+            </section>
+            <section class="org-box org-d" aria-labelledby="org-brown">
+              <h4 id="org-brown"><span class="org-office">U.S. Senate<span class="vh">:</span></span> Sherrod Brown (D)</h4>
+              <div class="org-item"><strong>Heritage Action</strong><p>12% in his last full Congress (118th, 2023–2024). 4% lifetime.</p><span class="cmp-src">Source: <a href="https://heritageaction.com/scorecard/members/B000944/118" target="_blank" rel="noopener noreferrer">Heritage Action scorecard: Sherrod Brown, 118th Congress</a></span></div>
+              <div class="org-item"><strong>NRA-PVF</strong><p>Grade F: "True enemy of gun owners' rights."</p><span class="cmp-src">Source: <a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></span></div>
+            </section>
+          </div>
         </section>
       </div>
+
+      <section class="cmp-srcs" aria-labelledby="cmp-srcs-title">
+        <h3 id="cmp-srcs-title">Sources</h3>
+        <div class="cmp-srcs-groups">
+          <div>
+            <h4>Governor</h4>
+            <ul>
+              <li><a href="https://ohiocapitaljournal.com/2026/10/28/where-ohios-candidates-for-governor-stand-on-abortion/" target="_blank" rel="noopener noreferrer">Where Ohio's candidates for governor stand on abortion, 10/28/2026</a></li>
+              <li><a href="https://actonforgovernor.com/issue/ensuring-reproductive-freedom/" target="_blank" rel="noopener noreferrer">Acton's own campaign website</a></li>
+              <li><a href="https://www.buckeyefirearms.org/ramaswamy-v-acton-choice-clear-gun-rights-even-if-dr-lockdown-masks-her-views" target="_blank" rel="noopener noreferrer">Ramaswamy v. Acton: Choice is clear, 09/10/2026</a></li>
+              <li><a href="https://www.dailysignal.com/2023/08/31/no-lockdown-ever-again-2024-candidates-push-back-against-future-covid-lockdowns-mandates/" target="_blank" rel="noopener noreferrer">2024 Candidates Push Back Against Future COVID-19 Lockdowns, Mandates</a></li>
+              <li><a href="https://www.politico.com/news/magazine/2025/06/28/amy-acton-ohio-governor-covid-vivek-ramaswamy-00425789" target="_blank" rel="noopener noreferrer">Can 'Ohio's Anthony Fauci' Beat Vivek Ramaswamy?</a></li>
+              <li><a href="https://www.wosu.org/politics-government/2025-08-21/ohio-governor-candidate-vivek-ramaswamy-gives-his-vision-for-education-at-hilliard-event" target="_blank" rel="noopener noreferrer">Ramaswamy gives his vision for education at Hilliard event, 08/21/2025</a></li>
+              <li><a href="https://actonforgovernor.com/issue/education/" target="_blank" rel="noopener noreferrer">Acton's own campaign website (education)</a></li>
+              <li><a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></li>
+              <li><a href="https://www.buckeyefirearms.org/bfa-pac-endorses-vivek-ramaswamy-ohio-governor" target="_blank" rel="noopener noreferrer">BFA-PAC endorses Vivek Ramaswamy for Ohio governor, 04/15/2026</a></li>
+              <li><a href="https://sbaprolife.org/newsroom/press-releases/leading-natl-pro-life-group-endorses-vivek-ramaswamy-for-ohio-governor" target="_blank" rel="noopener noreferrer">SBA Pro-Life America endorses Vivek Ramaswamy, 07/09/2026</a></li>
+              <li><a href="https://ohiolife.org/ohio-right-to-life-pac-announces-2026-general-election-candidate-recommendations/" target="_blank" rel="noopener noreferrer">Ohio Right to Life PAC 2026 general election recommendations, 08/10/2026</a></li>
+              <li><a href="https://rtlaohio.org/news/rtlaco-endorses-vivek-ramaswamy-1" target="_blank" rel="noopener noreferrer">RTLACO endorses Vivek Ramaswamy</a></li>
+              <li><a href="https://www.buckeyefirearms.org/3-new-gun-control-bills-introduced-ohio-house" target="_blank" rel="noopener noreferrer">3 New Gun Control Bills Introduced in Ohio House, 05/26/2020</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>U.S. Senate</h4>
+            <ul>
+              <li><a href="https://www.cbsnews.com/news/save-america-act-photo-id-amendment-senate-vote/" target="_blank" rel="noopener noreferrer">Senate rejects Husted photo-ID amendment, 03/26/2026</a></li>
+              <li><a href="https://www.daytondailynews.com/local/husted-push-for-federal-voter-id-fails-brown-calls-it-unnecessary/2KBRVHMWTZGUXI3BZQOMQOQADQ/" target="_blank" rel="noopener noreferrer">Husted push for federal voter ID fails; Brown calls it unnecessary, 03/24/2026</a></li>
+              <li><a href="https://www.tpaction.com/scorecard/legislators/jonhusted" target="_blank" rel="noopener noreferrer">Turning Point Action scorecard: Jon Husted</a></li>
+              <li><a href="https://www.nrsc.org/press-releases/sherrod-brown-wont-answer-if-ice-should-be-abolished-2026-08-28/" target="_blank" rel="noopener noreferrer">Sherrod Brown Won't Answer if ICE Should be Abolished, 08/28/2026</a></li>
+              <li><a href="https://www.nrapvf.org/grades/ohio/" target="_blank" rel="noopener noreferrer">NRA-PVF Ohio grades, 2026</a></li>
+              <li><a href="https://nrlc.org/communications/nrl-endorses-senator-jon-husted-for-election-to-the-u-s-senate/" target="_blank" rel="noopener noreferrer">National Right to Life endorses Senator Jon Husted, 09/03/2026</a></li>
+              <li><a href="https://www.cbsnews.com/news/sherrod-brown-abortion-access-ohio-senate-reelection/" target="_blank" rel="noopener noreferrer">Sherrod Brown focuses on abortion access in reelection race, 11/28/2023</a></li>
+              <li><a href="https://heritageaction.com/scorecard/members/H001104" target="_blank" rel="noopener noreferrer">Heritage Action scorecard: Jon Husted</a></li>
+              <li><a href="https://ohiolife.org/ohio-right-to-life-pac-announces-2026-general-election-candidate-recommendations/" target="_blank" rel="noopener noreferrer">Ohio Right to Life PAC 2026 general election recommendations, 08/10/2026</a></li>
+              <li><a href="https://heritageaction.com/scorecard/members/B000944/118" target="_blank" rel="noopener noreferrer">Heritage Action scorecard: Sherrod Brown, 118th Congress</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <p class="cmp-updated">Last updated: October 30, 2026</p>
     </section>
   </div>
   </div>
