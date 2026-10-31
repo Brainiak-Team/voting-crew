@@ -2,6 +2,17 @@
 
 My Voting Crew follows [Semantic Versioning](https://semver.org): MAJOR.MINOR.PATCH. Versions before 1.0.0 were the alpha: features were still arriving and saved lists could be reset. From 1.0.0 on, a saved list is kept across updates, and a change that would break it would be a new major version. Each new design or feature set is a minor version, and bug fixes are patches. Each version is tagged on its commit. From 1.2.0 on, Mainiak adds the tag after merging.
 
+## 1.5.0 (2026-10-31)
+
+An intro screen now opens the site on every visit, drawn from Mainiak's sketch. The main page, the More screen, the poll, printing and the flyer are unchanged.
+
+- "Make a List" in blue Dancing Script, then "Bring friends to vote!" and "Have 5 times the impact!" in the site's own bold font (Archivo Black), a red Ohio in the middle, and "Tap anywhere to start!" ("Click anywhere to start!" with a mouse) in pulsing grey below.
+- Red flag stripes run corner to corner behind everything. Each stripe has rounded ends and stops short of the words, every star and Ohio, leaving a clear patch around Ohio.
+- 17 blue stars, for Ohio as the 17th state, burst out from behind Ohio as the screen opens. Seven ring Ohio; the other ten fly far, growing as they go. In flight some pass in front of the words, but none comes to rest on them. With reduced motion turned on, the stars simply appear in place and the tap line does not pulse.
+- Five star layouts for upright screens and five for sideways screens. One is picked at random on each visit. Turning the screen switches to the same-numbered layout for the new shape.
+- A tap, a click or any key press closes the intro. Until then the page behind is out of reach of the keyboard and screen readers. The intro never prints.
+- Dancing Script is self-hosted in `fonts/` with its license (SIL Open Font License).
+
 ## 1.4.0 (2026-10-30)
 
 The More screen is re-sourced from a conservative point of view. Each claim now rests on voting records, scorecards, endorsements or quotations, with a source under every claim. Apart from the hint, the main page, the poll, printing and the flyer are unchanged.
